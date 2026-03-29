@@ -28,6 +28,51 @@ icoFile     := A_ScriptDir . "\rucoy_icon.ico"
 libDir      := rootDir . "\lib"
 wv2File     := libDir . "\WebView2.ahk"
 
+
+; ==========================================================
+; АВТООБНОВЛЕНИЕ
+; ==========================================================
+Global CurrentVersion := "1.0.0"
+; ВСТАВЬ СЮДА СВОЮ БАЗОВУЮ ССЫЛКУ ИЗ GITHUB (со слэшем на конце)
+Global RepoRawUrl := "https://raw.githubusercontent.com/dobbitaylor-dot/ponosdeda111/main/"
+
+CheckForUpdates() {
+    Global CurrentVersion, RepoRawUrl, htmlFile
+    try {
+        whr := ComObject("WinHttp.WinHttpRequest.5.1")
+        whr.Open("GET", RepoRawUrl . "version.txt", true)
+        whr.Send()
+        whr.WaitForResponse(3) ; Ждем максимум 3 секунды
+        
+        ; Очищаем полученный текст от лишних пробелов и переносов строк
+        remoteVersion := Trim(whr.ResponseText, "`r`n `t")
+
+        ; Проверяем, что скачалась именно версия (а не HTML страница с ошибкой) и она отличается от текущей
+        if (remoteVersion != "" && InStr(remoteVersion, "<") = 0 && remoteVersion != CurrentVersion) {
+            
+            result := MsgBox("Доступна новая версия макроса: " remoteVersion "`nТекущая версия: " CurrentVersion "`n`nОбновить сейчас?", "Обновление Rucoy Macro Pro", "YesNo Iconi")
+            
+            if (result = "Yes") {
+                ; Скачиваем новый AHK скрипт во временный файл, затем заменяем текущий
+                Download(RepoRawUrl . "macro.ahk", A_ScriptFullPath ".tmp")
+                FileMove(A_ScriptFullPath ".tmp", A_ScriptFullPath, 1)
+                
+                ; Скачиваем новый HTML интерфейс
+                Download(RepoRawUrl . "rucoy_launcher.html", htmlFile ".tmp")
+                FileMove(htmlFile ".tmp", htmlFile, 1)
+
+                MsgBox("Обновление успешно установлено! Макрос будет перезапущен.", "Готово", "Iconi")
+                Reload() ; Перезапускаем обновленный скрипт
+            }
+        }
+    } catch {
+        ; Если нет интернета или GitHub недоступен - просто игнорируем ошибку и запускаем макрос как обычно
+    }
+}
+
+; Запускаем проверку обновлений перед открытием окна
+CheckForUpdates()
+
 ; --- ПАПКИ ---
 try {
     DirCreate(profilesDir)
