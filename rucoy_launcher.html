@@ -279,7 +279,6 @@ input.w40{width:40px;}input.w60{width:60px;}input.w70{width:70px;}
     <div class="status-item" style="margin-left:auto;"><span class="status-label">ПРИВ:</span><span id="tagTimerDisp" style="font-size:12px;font-weight:700;color:var(--text3);transition:color .5s;">—</span></div>
   </div>
 
-  <!-- HOME -->
   <div class="screen active" id="screenHome">
     <div class="card-grid">
       <div class="card c-cyan" onclick="showScreen('screenHeal')">
@@ -326,7 +325,6 @@ input.w40{width:40px;}input.w60{width:60px;}input.w70{width:70px;}
     <button class="btn btn-cyan btn-full" onclick="saveAll()">💾 СОХРАНИТЬ ВСЕ НАСТРОЙКИ</button>
   </div>
 
-  <!-- HEAL -->
   <div class="screen" id="screenHeal">
     <div class="back-btn" onclick="showScreen('screenHome')">← Назад</div>
     <div class="two-col">
@@ -359,7 +357,6 @@ input.w40{width:40px;}input.w60{width:60px;}input.w70{width:70px;}
     <button class="btn btn-cyan btn-full" onclick="saveAll()">💾 Сохранить</button>
   </div>
 
-  <!-- WARRIOR -->
   <div class="screen" id="screenWarrior">
     <div class="back-btn" onclick="showScreen('screenHome')">← Назад</div>
     <div class="panel">
@@ -373,7 +370,6 @@ input.w40{width:40px;}input.w60{width:60px;}input.w70{width:70px;}
     <button class="btn btn-red btn-full" onclick="saveAll()">💾 Сохранить</button>
   </div>
 
-  <!-- LOOT -->
   <div class="screen" id="screenLoot">
     <div class="back-btn" onclick="showScreen('screenHome')">← Назад</div>
     <div class="panel">
@@ -396,7 +392,6 @@ input.w40{width:40px;}input.w60{width:60px;}input.w70{width:70px;}
     <button class="btn btn-green btn-full" onclick="saveAll()">💾 Сохранить</button>
   </div>
 
-  <!-- SW/CB -->
   <div class="screen" id="screenSwCb">
     <div class="back-btn" onclick="showScreen('screenHome')">← Назад</div>
     <div class="panel">
@@ -412,13 +407,14 @@ input.w40{width:40px;}input.w60{width:60px;}input.w70{width:70px;}
       <div class="panel-header"><span class="panel-icon">🔥</span><span class="panel-title red">Комбо</span></div>
       <div class="panel-body">
         <div class="form-row"><span class="form-label">Хоткей:</span><div class="hotkey-tag" id="hkCb" tabindex="0" onclick="startRecording(this,'comboHotkey')">—</div></div>
-        <div class="form-row"><span class="form-label">Ульта:</span><input type="text" id="cbUlt" value="" class="w40"><span class="form-label" style="margin-left:8px;">Задержка:</span><input type="number" id="cbDelay" value="1540" class="w70"><span style="color:var(--text3);">мс</span></div>
+        <div class="form-row" style="gap:6px;"><span style="color:var(--text3);">К1:</span><input type="text" id="cbClass1" value="" class="w40"><span style="color:var(--text3);">Ул:</span><input type="text" id="cbUlt" value="" class="w40"><span style="color:var(--text3);">К2:</span><input type="text" id="cbClass2" value="" class="w40"></div>
+        <div class="form-row"><span class="form-label">Зад. К1:</span><input type="number" id="cbC1D" value="20" class="w60"><span style="color:var(--text3);margin-right:8px;">мс</span><span class="form-label">Зад. Ул:</span><input type="number" id="cbUD" value="20" class="w60"><span style="color:var(--text3);">мс</span></div>
+        <div class="form-row"><span class="form-label">Зад. К2:</span><input type="number" id="cbC2D" value="1500" class="w60"><span style="color:var(--text3);">мс</span></div>
       </div>
     </div>
     <button class="btn btn-yellow btn-full" onclick="saveAll()">💾 Сохранить</button>
   </div>
 
-  <!-- TAG -->
   <div class="screen" id="screenTag">
     <div class="back-btn" onclick="showScreen('screenHome')">← Назад</div>
     <div class="panel">
@@ -444,7 +440,6 @@ input.w40{width:40px;}input.w60{width:60px;}input.w70{width:70px;}
     <button class="btn btn-pink btn-full" onclick="saveAll()">💾 Сохранить</button>
   </div>
 
-  <!-- WINDOW -->
   <div class="screen" id="screenWindow">
     <div class="back-btn" onclick="showScreen('screenHome')">← Назад</div>
     <div class="panel">
@@ -459,7 +454,6 @@ input.w40{width:40px;}input.w60{width:60px;}input.w70{width:70px;}
 
 </div>
 
-<!-- MODAL: WINDOW -->
 <div class="modal-overlay" id="winModal">
   <div class="modal">
     <div class="modal-header">
@@ -477,7 +471,6 @@ input.w40{width:40px;}input.w60{width:60px;}input.w70{width:70px;}
   </div>
 </div>
 
-<!-- CAPTURE OVERLAY -->
 <div id="captureOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:200;align-items:center;justify-content:center;flex-direction:column;gap:12px;">
   <div style="background:var(--panel);border:2px solid var(--cyan);border-radius:14px;padding:20px 28px;text-align:center;box-shadow:0 0 40px rgba(0,212,255,0.3);max-width:360px;width:90%;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
@@ -486,7 +479,6 @@ input.w40{width:40px;}input.w60{width:60px;}input.w70{width:70px;}
     </div>
     <div id="captureHint" style="font-size:13px;color:var(--yellow);font-weight:600;margin-bottom:10px;"></div>
 
-    <!-- ЛУПА -->
     <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:12px;">
       <div style="font-size:9px;color:var(--text3);letter-spacing:2px;margin-bottom:6px;font-family:'Rajdhani',sans-serif;">ЛУПА — НАВЕДИ И НАЖМИ ПРОБЕЛ</div>
       <canvas id="loupeCanvas" width="198" height="198" style="border-radius:8px;border:1px solid var(--border2);image-rendering:pixelated;"></canvas>
@@ -527,10 +519,9 @@ if (window.chrome && window.chrome.webview) {
     else if (cmd === 'TAG_FIRED') { startTagTimer(); }
     else if (cmd === 'LOUPE') {
       var parts2 = data.split('|');
-      drawLoupe(parts2[2]); // gridData начинается с index 2 (mx=0, my=1, grid=2)
+      drawLoupe(parts2[2]); 
     }
     else if (cmd === 'LOUPE_STOP') {
-      // лупа остановлена — ничего не делаем, canvas остаётся
     }
     else if (cmd === 'TOAST')   { showToast(data, 'success'); }
     else if (cmd === 'CAPTURE_WAIT') { showCaptureOverlay(data); }
@@ -585,14 +576,21 @@ function applyProfile(d) {
     setVal('lootPresses',    d.lootPresses);
     setVal('lootPressDelay', d.lootPressDelay);
     setVal('lootWaitDelay',  d.lootWaitDelay);
+    
     setVal('swClass1', d.swClass1);
     setVal('swUlt',    d.swUlt);
     setVal('swClass2', d.swClass2);
     setVal('swC1D',    d.swClass1Delay);
     setVal('swUD',     d.swUltDelay);
     setVal('swC2D',    d.swClass2Delay);
+    
+    setVal('cbClass1', d.comboClass1);
     setVal('cbUlt',    d.comboUlt);
-    setVal('cbDelay',  d.comboUltDelay);
+    setVal('cbClass2', d.comboClass2);
+    setVal('cbC1D',    d.comboC1D);
+    setVal('cbUD',     d.comboUD);
+    setVal('cbC2D',    d.comboC2D);
+    
     setVal('tagC1',  d.tagClass1);    setVal('tagC1D', d.tagClass1Delay);
     setVal('tagU1',  d.tagUlt1);      setVal('tagU1D', d.tagUlt1Delay);
     setVal('tagC2',  d.tagClass2);    setVal('tagC2D', d.tagClass2Delay);
@@ -740,7 +738,8 @@ function saveAll() {
     hotkeyStart: gt('hkStart'), hotkeyTag: gt('hkTag'), swHotkey: gt('hkSw'), comboHotkey: gt('hkCb'),
     swClass1: g('swClass1'), swClass1Delay: g('swC1D'), swUlt: g('swUlt'), swUltDelay: g('swUD'),
     swClass2: g('swClass2'), swClass2Delay: g('swC2D'),
-    comboUlt: g('cbUlt'), comboUltDelay: g('cbDelay'),
+    comboClass1: g('cbClass1'), comboC1D: g('cbC1D'), comboUlt: g('cbUlt'), comboUD: g('cbUD'),
+    comboClass2: g('cbClass2'), comboC2D: g('cbC2D'),
     healDelay: g('healDelay'),
     healTolerance: g('healTolerance'),
     lootTolerance: g('lootTolerance'),
@@ -1001,7 +1000,6 @@ function switchTagTab(i){
 })();
 </script>
 
-<!-- TAG INFO OVERLAY -->
 <div class="tag-info-overlay" id="tagInfoOverlay">
   <div class="tag-info-box">
     <div class="tag-info-header">

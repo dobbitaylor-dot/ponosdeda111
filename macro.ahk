@@ -28,12 +28,10 @@ icoFile     := A_ScriptDir . "\rucoy_icon.ico"
 libDir      := rootDir . "\lib"
 wv2File     := libDir . "\WebView2.ahk"
 
-
 ; ==========================================================
 ; АВТООБНОВЛЕНИЕ
 ; ==========================================================
-Global CurrentVersion := "1.0.1"
-; ВСТАВЬ СЮДА СВОЮ БАЗОВУЮ ССЫЛКУ ИЗ GITHUB (со слэшем на конце)
+Global CurrentVersion := "1.0.2"
 Global RepoRawUrl := "https://raw.githubusercontent.com/dobbitaylor-dot/ponosdeda111/main/"
 
 CheckForUpdates() {
@@ -44,33 +42,26 @@ CheckForUpdates() {
         whr.Send()
         whr.WaitForResponse(3) ; Ждем максимум 3 секунды
         
-        ; Очищаем полученный текст от лишних пробелов и переносов строк
         remoteVersion := Trim(whr.ResponseText, "`r`n `t")
 
-        ; Проверяем, что скачалась именно версия (а не HTML страница с ошибкой) и она отличается от текущей
         if (remoteVersion != "" && InStr(remoteVersion, "<") = 0 && remoteVersion != CurrentVersion) {
-            
             result := MsgBox("Доступна новая версия макроса: " remoteVersion "`nТекущая версия: " CurrentVersion "`n`nОбновить сейчас?", "Обновление Rucoy Macro Pro", "YesNo Iconi")
-            
             if (result = "Yes") {
-                ; Скачиваем новый AHK скрипт во временный файл, затем заменяем текущий
                 Download(RepoRawUrl . "macro.ahk", A_ScriptFullPath ".tmp")
                 FileMove(A_ScriptFullPath ".tmp", A_ScriptFullPath, 1)
                 
-                ; Скачиваем новый HTML интерфейс
                 Download(RepoRawUrl . "rucoy_launcher.html", htmlFile ".tmp")
                 FileMove(htmlFile ".tmp", htmlFile, 1)
 
                 MsgBox("Обновление успешно установлено! Макрос будет перезапущен.", "Готово", "Iconi")
-                Reload() ; Перезапускаем обновленный скрипт
+                Reload()
             }
         }
     } catch {
-        ; Если нет интернета или GitHub недоступен - просто игнорируем ошибку и запускаем макрос как обычно
     }
 }
 
-; Запускаем проверку обновлений перед открытием окна
+; Запускаем проверку обновлений
 CheckForUpdates()
 
 ; --- ПАПКИ ---
@@ -233,8 +224,12 @@ LoadProfile(id) {
     p["SwClass2Key"]   := IniRead(ini, "Switch", "Class2Key",   "")
     p["SwClass2Delay"] := SafeInt(IniRead(ini, "Switch", "Class2Delay", "1000"), 1000)
 
-    p["ComboUltKey"]   := IniRead(ini, "Combo", "UltKey",  "")
-    p["ComboUltDelay"] := SafeInt(IniRead(ini, "Combo", "UltDelay", "1540"), 1540)
+    p["ComboClass1Key"]   := IniRead(ini, "Combo", "Class1Key",   "")
+    p["ComboClass1Delay"] := SafeInt(IniRead(ini, "Combo", "Class1Delay", "20"),   20)
+    p["ComboUltKey"]      := IniRead(ini, "Combo", "UltKey",      "")
+    p["ComboUltDelay"]    := SafeInt(IniRead(ini, "Combo", "UltDelay",    "20"),   20)
+    p["ComboClass2Key"]   := IniRead(ini, "Combo", "Class2Key",   "")
+    p["ComboClass2Delay"] := SafeInt(IniRead(ini, "Combo", "Class2Delay", "1500"), 1500)
 
     p["ManaX"]     := SafeInt(IniRead(ini, "Mana", "X",     0))
     p["ManaY"]     := SafeInt(IniRead(ini, "Mana", "Y",     0))
@@ -289,6 +284,7 @@ LoadProfile(id) {
     p["IsSwitchRunning"] := false
     p["IsComboRunning"]  := false
     p["SwitchStep"]      := 1
+    p["ComboStep"]       := 1
     p["SwitchTimerFn"]   := RunSwitchStep.Bind(p)
     p["ComboTimerFn"]    := RunComboStep.Bind(p)
     p["LastManaPress"]   := 0
@@ -396,9 +392,15 @@ SaveProfile(parts) {
     WriteFieldInt(data, ini, "Switch","UltDelay",    "swUltDelay",     p, "SwUltDelay")
     WriteField(data, ini, "Switch",  "Class2Key",    "swClass2",       p, "SwClass2Key")
     WriteFieldInt(data, ini, "Switch","Class2Delay", "swClass2Delay",  p, "SwClass2Delay")
+    
     WriteField(data, ini, "Combo",   "Hotkey",       "comboHotkey",    p, "ComboHotkey")
+    WriteField(data, ini, "Combo",   "Class1Key",    "comboClass1",    p, "ComboClass1Key")
+    WriteFieldInt(data, ini, "Combo","Class1Delay",  "comboC1D",       p, "ComboClass1Delay")
     WriteField(data, ini, "Combo",   "UltKey",       "comboUlt",       p, "ComboUltKey")
-    WriteFieldInt(data, ini, "Combo","UltDelay",     "comboUltDelay",  p, "ComboUltDelay")
+    WriteFieldInt(data, ini, "Combo","UltDelay",     "comboUD",        p, "ComboUltDelay")
+    WriteField(data, ini, "Combo",   "Class2Key",    "comboClass2",    p, "ComboClass2Key")
+    WriteFieldInt(data, ini, "Combo","Class2Delay",  "comboC2D",       p, "ComboClass2Delay")
+    
     WriteFieldInt(data, ini, "Heal", "Delay",        "healDelay",      p, "HealDelay")
     WriteFieldInt(data, ini, "Heal", "Tolerance",    "healTolerance",  p, "HealTolerance")
     WriteFieldInt(data, ini, "Loot", "Tolerance",    "lootTolerance",  p, "LootTolerance")
@@ -475,6 +477,7 @@ SendProfileToJS(id) {
     j .= '"keyLoot":"' . EscJSON(p["ActionKeyLoot"]) . '",'
     j .= '"hotkeyStart":"' . EscJSON(p["HotkeyStart"]) . '",'
     j .= '"hotkeyTag":"' . EscJSON(p["HotkeyTag"]) . '",'
+    
     j .= '"swHotkey":"' . EscJSON(p["SwHotkey"]) . '",'
     j .= '"swClass1":"' . EscJSON(p["SwClass1Key"]) . '",'
     j .= '"swClass1Delay":' . p["SwClass1Delay"] . ","
@@ -482,9 +485,15 @@ SendProfileToJS(id) {
     j .= '"swUltDelay":' . p["SwUltDelay"] . ","
     j .= '"swClass2":"' . EscJSON(p["SwClass2Key"]) . '",'
     j .= '"swClass2Delay":' . p["SwClass2Delay"] . ","
+    
     j .= '"comboHotkey":"' . EscJSON(p["ComboHotkey"]) . '",'
+    j .= '"comboClass1":"' . EscJSON(p["ComboClass1Key"]) . '",'
+    j .= '"comboC1D":' . p["ComboClass1Delay"] . ","
     j .= '"comboUlt":"' . EscJSON(p["ComboUltKey"]) . '",'
-    j .= '"comboUltDelay":' . p["ComboUltDelay"] . ","
+    j .= '"comboUD":' . p["ComboUltDelay"] . ","
+    j .= '"comboClass2":"' . EscJSON(p["ComboClass2Key"]) . '",'
+    j .= '"comboC2D":' . p["ComboClass2Delay"] . ","
+    
     j .= '"healDelay":' . p["HealDelay"] . ","
     j .= '"lootPresses":' . p["LootPresses"] . ","
     j .= '"lootPressDelay":' . p["LootPressDelay"] . ","
@@ -629,6 +638,7 @@ ReloadProfile(id) {
     }
     if wasCb {
         Profiles[id]["IsComboRunning"] := true
+        Profiles[id]["ComboStep"] := 1
         SetTimer(Profiles[id]["ComboTimerFn"], -1)
     }
     ReloadProfileHotkeys(Profiles[id])
@@ -684,6 +694,7 @@ OnComboHotkey(id, *) {
         p["IsComboRunning"] := false
     } else {
         p["IsComboRunning"] := true
+        p["ComboStep"] := 1
         SetTimer(p["ComboTimerFn"], -1)
     }
     SendStateToJS()
@@ -783,7 +794,6 @@ StartCapture(type) {
     Send2JS("CAPTURE_WAIT|" . type)
     SetTimer(SendLoupeData, 50)
 
-    ; Регистрируем Space как хоткей — он сработает в основном потоке
     try Hotkey("Space", OnCaptureSpace, "On")
 }
 
@@ -799,7 +809,6 @@ StopCapture() {
 OnCaptureSpace(*) {
     Global CaptureType, CaptureHwnd, ActiveTab, Profiles
 
-    ; Сохраняем до StopCapture который сбросит глобалы
     type := CaptureType
     hwnd := CaptureHwnd
     p    := Profiles[ActiveTab]
@@ -891,11 +900,9 @@ ConvertKeyForSend(key) {
     if (key = "") {
         return ""
     }
-    ; Если уже в фигурных скобках — не трогаем
     if (SubStr(key, 1, 1) = "{") {
         return key
     }
-    ; Обрабатываем комбинации типа Ctrl+Q, Shift+3, Alt+F
     mods := ""
     k := key
     Loop {
@@ -909,11 +916,9 @@ ConvertKeyForSend(key) {
             break
         }
     }
-    ; Одиночная буква — оборачиваем в {}
     if (StrLen(k) = 1 && k ~= "i)[a-z]") {
         return mods . "{" . k . "}"
     }
-    ; Всё остальное (цифры, F-клавиши, Space и т.д.) — как есть
     return mods . k
 }
 
@@ -952,7 +957,7 @@ ProcessProfile(p) {
         }
     }
 
-    ; HP1 (Срабатывает при появлении цвета)
+    ; HP1
     if (p["HpColor"] != "") {
         try {
             if ColorsMatch(PixelGetColor(cx + p["HpX"], cy + p["HpY"]), p["HpColor"], p["HealTolerance"]) {
@@ -975,7 +980,7 @@ ProcessProfile(p) {
         }
     }
 
-    ; Мана (Срабатывает при появлении цвета)
+    ; Мана
     if (!p["WarriorMode"] && p["ManaColor"] != "") {
         try {
             if ColorsMatch(PixelGetColor(cx + p["ManaX"], cy + p["ManaY"]), p["ManaColor"], p["HealTolerance"]) {
@@ -1048,8 +1053,20 @@ RunComboStep(p) {
         SendStateToJS()
         return
     }
-    SendKeyToTarget(p["ComboUltKey"], hwnd)
-    SetTimer(p["ComboTimerFn"], -p["ComboUltDelay"])
+    step := p["ComboStep"]
+    if (step = 1) {
+        SendKeyToTarget(p["ComboClass1Key"], hwnd)
+        p["ComboStep"] := 2
+        SetTimer(p["ComboTimerFn"], -p["ComboClass1Delay"])
+    } else if (step = 2) {
+        SendKeyToTarget(p["ComboUltKey"], hwnd)
+        p["ComboStep"] := 3
+        SetTimer(p["ComboTimerFn"], -p["ComboUltDelay"])
+    } else {
+        SendKeyToTarget(p["ComboClass2Key"], hwnd)
+        p["ComboStep"] := 1
+        SetTimer(p["ComboTimerFn"], -p["ComboClass2Delay"])
+    }
 }
 
 TagMobs(p) {
