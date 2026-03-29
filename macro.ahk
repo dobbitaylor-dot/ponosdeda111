@@ -31,7 +31,7 @@ wv2File     := libDir . "\WebView2.ahk"
 ; ==========================================================
 ; АВТООБНОВЛЕНИЕ
 ; ==========================================================
-Global CurrentVersion := "1.0.2"
+Global CurrentVersion := "1.0.3"
 Global RepoRawUrl := "https://raw.githubusercontent.com/dobbitaylor-dot/ponosdeda111/main/"
 
 CheckForUpdates() {
@@ -379,6 +379,12 @@ SaveProfile(parts) {
 
     data := parts[2]
 
+    ; Сохраняем старые хоткеи до перезаписи, чтобы потом их отключить
+    oldStart := p["HotkeyStart"]
+    oldTag   := p["HotkeyTag"]
+    oldSw    := p["SwHotkey"]
+    oldCombo := p["ComboHotkey"]
+
     WriteField(data, ini, "Keys",    "Mana",        "keyMana",        p, "ActionKeyMana")
     WriteField(data, ini, "Keys",    "HP",           "keyHp",          p, "ActionKeyHP")
     WriteField(data, ini, "Keys",    "Warrior",      "keyWarrior",     p, "ActionKeyWarrior")
@@ -424,7 +430,7 @@ SaveProfile(parts) {
     WriteField(data, ini, "Tag",    "MageAim",       "mageAim",        p, "MageAimKey")
     WriteFieldInt(data, ini, "Tag", "MageAimDelay",  "mageAimDelay",   p, "MageAimDelay")
 
-    ReloadProfileHotkeys(p)
+    ReloadProfileHotkeys(p, oldStart, oldTag, oldSw, oldCombo)
 }
 
 WriteField(data, ini, sec, key, jsonKey, p, pKey) {
@@ -609,11 +615,11 @@ InitHotkeys() {
     }
 }
 
-ReloadProfileHotkeys(p) {
-    BindHotkey("", p["HotkeyStart"], OnStartHotkey.Bind(p["id"]))
-    BindHotkey("", p["HotkeyTag"],   OnTagHotkey.Bind(p["id"]))
-    BindHotkey("", p["SwHotkey"],    OnSwHotkey.Bind(p["id"]))
-    BindHotkey("", p["ComboHotkey"], OnComboHotkey.Bind(p["id"]))
+ReloadProfileHotkeys(p, oldStart:="", oldTag:="", oldSw:="", oldCombo:="") {
+    BindHotkey(oldStart, p["HotkeyStart"], OnStartHotkey.Bind(p["id"]))
+    BindHotkey(oldTag,   p["HotkeyTag"],   OnTagHotkey.Bind(p["id"]))
+    BindHotkey(oldSw,    p["SwHotkey"],    OnSwHotkey.Bind(p["id"]))
+    BindHotkey(oldCombo, p["ComboHotkey"], OnComboHotkey.Bind(p["id"]))
 }
 
 ReloadProfile(id) {
@@ -621,6 +627,8 @@ ReloadProfile(id) {
     wasRunning := Profiles[id]["IsRunning"]
     wasSw      := Profiles[id]["IsSwitchRunning"]
     wasCb      := Profiles[id]["IsComboRunning"]
+    
+    ; Отключаем старые хоткеи
     for _, hk in [Profiles[id]["HotkeyStart"], Profiles[id]["HotkeyTag"],
                   Profiles[id]["SwHotkey"],    Profiles[id]["ComboHotkey"]] {
         if (hk != "") {
@@ -629,8 +637,10 @@ ReloadProfile(id) {
             }
         }
     }
+    
     Profiles[id] := LoadProfile(id)
     Profiles[id]["IsRunning"] := wasRunning
+    
     if wasSw {
         Profiles[id]["IsSwitchRunning"] := true
         Profiles[id]["SwitchStep"] := 1
@@ -641,6 +651,8 @@ ReloadProfile(id) {
         Profiles[id]["ComboStep"] := 1
         SetTimer(Profiles[id]["ComboTimerFn"], -1)
     }
+    
+    ; Тут передавать старые не надо, так как мы их уже выключили вручную циклом выше
     ReloadProfileHotkeys(Profiles[id])
 }
 
