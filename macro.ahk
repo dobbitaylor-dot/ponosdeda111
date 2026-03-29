@@ -32,7 +32,7 @@ wv2File     := libDir . "\WebView2.ahk"
 ; ==========================================================
 ; АВТООБНОВЛЕНИЕ
 ; ==========================================================
-Global CurrentVersion := "1.0.0"
+Global CurrentVersion := "1.0.1"
 ; ВСТАВЬ СЮДА СВОЮ БАЗОВУЮ ССЫЛКУ ИЗ GITHUB (со слэшем на конце)
 Global RepoRawUrl := "https://raw.githubusercontent.com/dobbitaylor-dot/ponosdeda111/main/"
 
