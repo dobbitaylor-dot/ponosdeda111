@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rucoy Macro Pro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f1117;
+  --card-bg: rgba(255, 255, 255, 0.03);
+  --border: rgba(255, 255, 255, 0.08);
+  --border2: rgba(255, 255, 255, 0.14);
+  --accent: #6366f1;
+  --accent-glow: rgba(99, 102, 241, 0.3);
+  --text: #f3f4f6;
+  --text2: #c4c9d4;
+  --text3: #9ca3af;
+  --cyan: #818cf8;
+  --green: #34d399;
+  --red: #ef4444;
+  --yellow: #fbbf24;
+  --purple: #a78bfa;
+  --pink: #e879f9;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  user-select: none;
+}
+body::before {
+  content: '';
+  position: fixed;
+  width: 300px; height: 300px;
+  background: rgba(99, 102, 241, 0.15);
+  border-radius: 50%;
+  filter: blur(80px);
+  top: -50px; left: -50px;
+  z-index: 0; pointer-events: none;
+}
+.app { max-width: 480px; margin: 0 auto; padding: 14px; position: relative; z-index: 1; }
+
+/* Header */
+.header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.logo { display: flex; align-items: center; gap: 8px; }
+.logo-icon { width: 32px; height: 32px; border-radius: 10px; background: linear-gradient(135deg, #818cf8, #c084fc); display: flex; align-items: center; justify-content: center; font-size: 16px; }
+.logo-title { font-size: 15px; font-weight: 700; background: linear-gradient(135deg, #818cf8, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.logo-sub { font-size: 9px; color: var(--text3); font-weight: 600; letter-spacing: 2px; }
+.scimitron-brand { font-size: 10px; color: var(--text3); font-weight: 600; letter-spacing: 2px; }
+
+/* Tabs */
+.profile-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 12px; }
+.tab-btn { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 8px 4px; cursor: pointer; text-align: center; transition: all 0.2s; backdrop-filter: blur(12px); }
+.tab-btn.active { border-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); background: rgba(99, 102, 241, 0.05); }
+.tab-name { font-weight: 600; font-size: 11px; margin-bottom: 2px; }
+.tab-btn.active .tab-name { color: #818cf8; }
+.tab-win { font-size: 9px; color: var(--text3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-bottom: 4px; }
+.tab-badge { font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 6px; background: rgba(255,255,255,0.05); display: inline-block; }
+.tab-badge.running { color: var(--success); background: rgba(52, 211, 153, 0.1); }
+
+/* Status bar */
+.status-bar { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 16px; font-size: 11px; backdrop-filter: blur(12px); gap: 8px; flex-wrap: nowrap; }
+.status-item { display: flex; gap: 5px; align-items: center; white-space: nowrap; }
+.status-label { color: var(--text3); }
+.status-value { font-weight: 600; color: var(--text3); transition: color 0.3s; }
+.status-value.on { color: var(--success); }
+
+/* Screens */
+.screen { display: none; animation: fadeIn 0.2s ease; }
+.screen.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+
+/* Cards */
+.card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+.card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 12px 6px; cursor: pointer; text-align: center; transition: all 0.2s ease; backdrop-filter: blur(12px); position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; }
+.card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 20px var(--accent-glow); }
+.card-icon { font-size: 22px; margin-bottom: 5px; display: block; }
+.card-title { font-weight: 600; font-size: 11px; color: var(--text); margin-bottom: 2px; }
+.card-desc { font-size: 9px; color: var(--text3); }
+.card-status { position: absolute; top: 8px; right: 8px; width: 7px; height: 7px; border-radius: 50%; background: var(--border); transition: 0.3s; }
+.card-status.ok { background: var(--success); box-shadow: 0 0 8px var(--success); }
+.card-status.on { background: var(--accent); box-shadow: 0 0 8px var(--accent); animation: blink 1.5s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+/* Launch bar */
+.launch-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+.btn-copy { display: block; width: 100%; padding: 9px 12px; background: var(--card-bg); border: 1px dashed var(--border2); border-radius: 12px; color: var(--text3); font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.2s; backdrop-filter: blur(12px); margin-bottom: 8px; }
+.btn-copy:hover { color: #818cf8; border-color: var(--accent); background: rgba(99, 102, 241, 0.07); }
+.mass-chk { display: flex; align-items: center; gap: 7px; margin-top: 6px; }
+.mass-chk input { width: 15px; height: 15px; cursor: pointer; }
+.mass-secs { display: flex; gap: 12px; flex-wrap: wrap; }
+.mass-sec { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text2); cursor: pointer; user-select: none; }
+.mass-sec input { width: 14px; height: 14px; cursor: pointer; }
+.mass-state { font-size: 9px; font-weight: 700; color: var(--text3); letter-spacing: 0.5px; }
+.mass-state.on { color: var(--green); }
+
+/* Back button */
+.back-btn { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.2s; color: var(--text2); margin-bottom: 12px; font-size: 11px; backdrop-filter: blur(12px); }
+.back-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* Panels */
+.panel { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 0; margin-bottom: 12px; backdrop-filter: blur(12px); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); overflow: hidden; }
+.panel-header { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+.panel-icon { font-size: 14px; }
+.panel-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+.panel-title.cyan { color: #818cf8; } .panel-title.red { color: #f87171; } .panel-title.green { color: #34d399; }
+.panel-title.yellow { color: #fbbf24; } .panel-title.pink { color: #e879f9; } .panel-title.purple { color: #a78bfa; }
+.panel-body { padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+/* Form rows */
+.form-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.form-label { color: var(--text3); display: flex; align-items: center; gap: 6px; flex: 1; font-size: 11px; }
+.divider { height: 1px; background: var(--border); margin: 4px 0; }
+
+/* Pixel */
+.pixel-status { display: flex; align-items: center; gap: 6px; }
+.pixel-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--red); box-shadow: 0 0 4px var(--red); transition: 0.3s; flex-shrink: 0; }
+.pixel-dot.ok { background: var(--success); box-shadow: 0 0 4px var(--success); }
+.pixel-color-swatch { width: 14px; height: 14px; border-radius: 4px; border: 1px solid var(--border); display: none; flex-shrink: 0; }
+.pixel-label { color: var(--text3); transition: color 0.3s; }
+
+/* Inputs */
+input[type="text"], input[type="number"] { background: rgba(0, 0, 0, 0.3); border: 1px solid var(--border); border-radius: 8px; color: #fff; padding: 6px 10px; font-family: 'Inter', monospace; font-size: 12px; outline: none; transition: all 0.2s ease; text-align: center; }
+input[type="text"]:focus, input[type="number"]:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-glow); }
+input.w40 { width: 44px; } input.w60 { width: 64px; } input.w70 { width: 84px; }
+
+/* Window display */
+.win-display { flex: 1; min-width: 0; padding: 6px 10px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px; color: var(--text3); font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.win-display.ok { color: #818cf8; border-color: rgba(99, 102, 241, 0.3); }
+
+/* Hotkey */
+.hotkey-tag { background: rgba(0, 0, 0, 0.3); border: 1px solid var(--border); border-radius: 8px; color: #c084fc; padding: 6px 12px; cursor: pointer; font-size: 12px; font-weight: 600; text-align: center; min-width: 60px; transition: 0.2s; }
+.hotkey-tag:hover { border-color: #c084fc; }
+.hotkey-tag.recording { border-color: var(--danger); color: var(--danger); animation: pulse 1s infinite; }
+@keyframes pulse { 0%,100%{box-shadow:0 0 2px var(--danger)} 50%{box-shadow:0 0 10px var(--danger)} }
+
+/* Toggle */
+.toggle { display: flex; align-items: center; gap: 5px; cursor: pointer; }
+.toggle-track { width: 36px; height: 20px; background: rgba(255, 255, 255, 0.1); border: 1px solid var(--border); border-radius: 20px; position: relative; transition: 0.2s; flex-shrink: 0; }
+.toggle-thumb { position: absolute; top: 3px; left: 3px; width: 12px; height: 12px; border-radius: 50%; background: var(--text3); transition: 0.2s; }
+.toggle.on .toggle-track { background: rgba(99, 102, 241, 0.3); border-color: var(--accent); }
+.toggle.on .toggle-thumb { transform: translateX(16px); background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+.toggle-label { color: var(--text3); transition: color 0.2s; font-size: 11px; }
+.toggle.on .toggle-label { color: var(--accent); }
+
+/* Buttons */
+.btn { background: var(--accent); color: #fff; border: none; border-radius: 10px; padding: 10px 16px; font-weight: 600; font-size: 12px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 14px var(--accent-glow); display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-family: 'Inter', sans-serif; }
+.btn:hover { opacity: 0.9; transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; transform: none; }
+.btn-cyan { background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.3); color: #818cf8; box-shadow: none; }
+.btn-cyan:hover { background: rgba(99, 102, 241, 0.25); box-shadow: 0 0 10px rgba(99, 102, 241, 0.2); }
+.btn-green { background: rgba(52, 211, 153, 0.15); border: 1px solid rgba(52, 211, 153, 0.3); color: #6ee7b7; box-shadow: none; }
+.btn-green:hover { background: rgba(52, 211, 153, 0.25); box-shadow: 0 0 10px rgba(52, 211, 153, 0.2); }
+.btn-red { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #fca5a5; box-shadow: none; }
+.btn-red:hover { background: rgba(239, 68, 68, 0.25); box-shadow: 0 0 10px rgba(239, 68, 68, 0.2); }
+.btn-yellow { background: rgba(251, 191, 36, 0.15); border: 1px solid rgba(251, 191, 36, 0.3); color: #fcd34d; box-shadow: none; }
+.btn-yellow:hover { background: rgba(251, 191, 36, 0.25); }
+.btn-purple { background: rgba(167, 139, 250, 0.15); border: 1px solid rgba(167, 139, 250, 0.3); color: #c4b5fd; box-shadow: none; }
+.btn-purple:hover { background: rgba(167, 139, 250, 0.25); }
+.btn-pink { background: rgba(232, 121, 249, 0.15); border: 1px solid rgba(232, 121, 249, 0.3); color: #f0abfc; box-shadow: none; }
+.btn-pink:hover { background: rgba(232, 121, 249, 0.25); }
+.btn-sm { padding: 5px 10px; font-size: 11px; border-radius: 8px; }
+.btn-full { width: 100%; margin-top: 12px; }
+.btn-xl { padding: 13px 20px; font-size: 13px; border-radius: 10px; }
+.pixel-reset-btn { padding: 5px 10px !important; border-color: rgba(239, 68, 68, 0.3) !important; color: #fca5a5 !important; font-size: 11px !important; }
+.pixel-reset-btn:hover { background: rgba(239, 68, 68, 0.15) !important; }
+
+/* Mage cycle */
+.mage-cycle { padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border); background: rgba(255,255,255,0.05); color: #818cf8; cursor: pointer; transition: 0.2s; font-size: 11px; width: 100%; text-align: center; font-family: 'Inter', sans-serif; }
+.mage-cycle:hover { border-color: #818cf8; background: rgba(99, 102, 241, 0.1); }
+
+/* Tolerance */
+.tol-block { margin-top: 4px; padding: 10px 12px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 10px; }
+.tol-title { font-size: 10px; color: var(--text3); letter-spacing: 1px; margin-bottom: 4px; font-weight: 700; text-transform: uppercase; }
+.tol-desc { font-size: 10px; color: var(--text3); margin-bottom: 8px; line-height: 1.5; }
+.tol-row { display: flex; align-items: center; gap: 8px; }
+.tol-slider { flex: 1; -webkit-appearance: none; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; outline: none; }
+.tol-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--accent); cursor: pointer; box-shadow: 0 0 8px var(--accent-glow); }
+.tol-val { min-width: 24px; text-align: center; color: var(--accent); font-size: 11px; font-weight: 700; }
+
+/* Modal */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(6px); z-index: 100; display: none; align-items: center; justify-content: center; }
+.modal-overlay.open { display: flex; }
+.modal { background: var(--bg); border: 1px solid var(--border); border-radius: 16px; width: 90%; max-width: 360px; max-height: 85vh; overflow-y: auto; box-shadow: 0 12px 40px rgba(0,0,0,0.5); padding: 0; animation: mi 0.2s ease; }
+@keyframes mi { from { opacity: 0; transform: scale(0.95) translateY(8px); } to { opacity: 1; transform: none; } }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border); padding: 16px 16px 10px; }
+.modal-title { font-weight: 700; color: #818cf8; font-size: 13px; }
+.modal-close { width: 24px; height: 24px; border-radius: 6px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); color: var(--text3); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-size: 12px; }
+.modal-close:hover { border-color: var(--red); color: var(--red); }
+.modal-body { padding: 0 16px 16px; display: flex; flex-direction: column; gap: 10px; }
+.modal-footer { padding: 10px 16px; border-top: 1px solid var(--border); display: flex; gap: 8px; justify-content: flex-end; }
+.modal-section { font-size: 10px; color: var(--text3); letter-spacing: 2px; text-transform: uppercase; font-weight: 600; }
+.modal-row { display: flex; align-items: center; gap: 8px; }
+.modal-label { min-width: 80px; color: var(--text3); font-size: 11px; }
+.win-list { background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 10px; max-height: 200px; overflow-y: auto; margin-bottom: 14px; }
+.win-item { padding: 10px; border-bottom: 1px solid var(--border); cursor: pointer; transition: 0.2s; font-size: 11px; }
+.win-item:last-child { border-bottom: none; }
+.win-item:hover { background: rgba(99, 102, 241, 0.1); }
+.win-item.selected { background: rgba(99, 102, 241, 0.2); border-left: 2px solid var(--accent); color: #fff; }
+.win-item-ico { font-size: 13px; flex-shrink: 0; }
+.win-item-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.win-item-pid { font-size: 9px; color: var(--text3); margin-top: 1px; }
+.win-refresh { display: flex; justify-content: flex-end; margin-bottom: 6px; }
+
+/* Toast */
+.toast-container { position: fixed; top: 16px; right: 16px; z-index: 200; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+.toast { padding: 10px 16px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; backdrop-filter: blur(10px); color: var(--text); font-size: 11px; animation: slideIn 0.3s ease; }
+.toast.success { border-color: rgba(52, 211, 153, 0.4); color: var(--success); }
+.toast.error { border-color: rgba(239, 68, 68, 0.4); color: var(--red); }
+.toast.info { border-color: rgba(99, 102, 241, 0.4); color: #818cf8; }
+@keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: none; } }
+
+/* Misc */
+.mob-keys { display: flex; gap: 4px; }
+.spinner { width: 10px; height: 10px; border: 2px solid rgba(99, 102, 241, 0.2); border-top-color: var(--accent); border-radius: 50%; animation: sp 0.7s linear infinite; }
+@keyframes sp { to { transform: rotate(360deg); } }
+.loading-overlay { display: flex; align-items: center; gap: 6px; color: var(--text3); padding: 16px; justify-content: center; }
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+/* Tag info overlay */
+.tag-info-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 200; align-items: center; justify-content: center; }
+.tag-info-overlay.open { display: flex; }
+.tag-info-box { background: var(--bg); border: 2px solid rgba(232, 121, 249, 0.4); border-radius: 16px; width: 90%; max-width: 380px; box-shadow: 0 0 40px rgba(232, 121, 249, 0.15); overflow: hidden; }
+.tag-info-header { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.tag-info-title { font-weight: 700; font-size: 13px; letter-spacing: 1px; color: var(--pink); }
+.tag-info-close { width: 24px; height: 24px; border-radius: 6px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); color: var(--text3); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; transition: all 0.2s; }
+.tag-info-close:hover { border-color: var(--red); color: var(--red); }
+.tag-info-tabs { display: flex; border-bottom: 1px solid var(--border); }
+.titab { padding: 8px 14px; font-size: 10px; cursor: pointer; color: var(--text3); border-bottom: 2px solid transparent; transition: all 0.2s; font-weight: 600; letter-spacing: 0.5px; white-space: nowrap; }
+.titab.active { color: var(--pink); border-bottom-color: var(--pink); }
+.tag-info-body { padding: 14px 16px; }
+.tipage { display: none; }
+.tipage.active { display: block; }
+.ti-seq { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; margin-bottom: 12px; }
+.ti-step { padding: 3px 8px; border-radius: 5px; font-size: 10px; font-weight: 600; }
+.ti-step.cls { background: rgba(167, 139, 250, 0.15); border: 1px solid rgba(167, 139, 250, 0.4); color: var(--purple); }
+.ti-step.ult { background: rgba(251, 191, 36, 0.12); border: 1px solid rgba(251, 191, 36, 0.35); color: var(--yellow); }
+.ti-step.mob { background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.3); color: #818cf8; }
+.ti-step.aim { background: rgba(52, 211, 153, 0.1); border: 1px solid rgba(52, 211, 153, 0.3); color: var(--success); }
+.ti-arrow { color: var(--text3); font-size: 10px; }
+.ti-tip { font-size: 10px; color: var(--text3); line-height: 1.6; padding: 5px 9px; border-left: 2px solid var(--border2); margin-bottom: 5px; border-radius: 0 4px 4px 0; }
+.ti-tip b { color: var(--yellow); }
+.ti-tip.warn { border-left-color: rgba(251, 191, 36, 0.5); background: rgba(251, 191, 36, 0.04); }
+.ti-tip.ok { border-left-color: rgba(52, 211, 153, 0.4); background: rgba(52, 211, 153, 0.03); }
+.tag-info-footer { padding: 10px 16px; border-top: 1px solid var(--border); text-align: center; }
+.tag-info-btn-close { padding: 6px 28px; border-radius: 8px; border: 1px solid rgba(232, 121, 249, 0.4); background: rgba(232, 121, 249, 0.07); color: var(--pink); cursor: pointer; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; transition: all 0.2s; font-family: 'Inter', sans-serif; }
+.tag-info-btn-close:hover { background: rgba(232, 121, 249, 0.18); }
+.tag-instr-btn { padding: 5px 12px; border-radius: 8px; border: 1px solid rgba(232, 121, 249, 0.35); background: rgba(232, 121, 249, 0.07); color: var(--pink); cursor: pointer; font-size: 10px; font-weight: 700; letter-spacing: 0.5px; transition: all 0.2s; font-family: 'Inter', sans-serif; }
+.tag-instr-btn:hover { background: rgba(232, 121, 249, 0.18); }
+
+@keyframes tpulse { 0%,100% { opacity: 1 } 50% { opacity: 0.35 } }
+
+</style>
+</head>
+<body>
+<canvas id="particleCanvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;"></canvas>
+<div class="app">
+
+  <div class="header">
+    <div class="logo">
+      <div class="logo-icon">⚔</div>
+      <div><div class="logo-title">RUCOY MACRO PRO</div><div class="logo-sub">AUTOMATION SUITE</div></div>
+    </div>
+    <div class="scimitron-brand">BY SCIMITRON</div>
+  </div>
+
+  <div class="profile-tabs">
+    <div class="tab-btn active" id="tab1" onclick="switchTab(1)">
+      <div><div class="tab-name">ПРОФИЛЬ 1</div><div class="tab-win" id="tabWin1">не выбрано</div></div>
+      <div class="tab-badge" id="tabBadge1">⏹ СТОП</div>
+    </div>
+    <div class="tab-btn" id="tab2" onclick="switchTab(2)">
+      <div><div class="tab-name">ПРОФИЛЬ 2</div><div class="tab-win" id="tabWin2">не выбрано</div></div>
+      <div class="tab-badge" id="tabBadge2">⏹ СТОП</div>
+    </div>
+    <div class="tab-btn" id="tab3" onclick="switchTab(3)">
+      <div><div class="tab-name">ПРОФИЛЬ 3</div><div class="tab-win" id="tabWin3">не выбрано</div></div>
+      <div class="tab-badge" id="tabBadge3">⏹ СТОП</div>
+    </div>
+    <div class="tab-btn" id="tab4" onclick="switchTab(4)">
+      <div><div class="tab-name">ПРОФИЛЬ 4</div><div class="tab-win" id="tabWin4">не выбрано</div></div>
+      <div class="tab-badge" id="tabBadge4">⏹ СТОП</div>
+    </div>
+  </div>
+
+  <div class="status-bar">
+    <div class="status-item"><span class="status-label">ХИЛ:</span><span class="status-value" id="sStat">⏹</span></div>
+    <div class="status-item"><span class="status-label">СВИЧ:</span><span class="status-value" id="sSw">ВЫКЛ</span></div>
+    <div class="status-item"><span class="status-label">КОМБО:</span><span class="status-value" id="sCb">ВЫКЛ</span></div>
+    <div class="status-item"><span class="status-label">РАДАР:</span><span class="status-value" id="sRad">ВЫКЛ</span></div>
+    <div class="status-item" style="margin-left:auto;"><span class="status-label">ПРИВ:</span><span id="tagTimerDisp" style="font-size:12px;font-weight:700;color:var(--text3);transition:color .5s;">—</span></div>
+  </div>
+
+  <div class="screen active" id="screenHome">
+    <div class="card-grid">
+      <div class="card c-cyan" onclick="showScreen('screenHeal')">
+        <div class="card-status" id="cardStatusHeal"></div>
+        <span class="card-icon">💊</span>
+        <div class="card-title">Авто-хил</div>
+
+      </div>
+      <div class="card c-pink" onclick="showScreen('screenTag')">
+        <div class="card-status" id="cardStatusTag"></div>
+        <span class="card-icon">🎯</span>
+        <div class="card-title">Приват</div>
+
+      </div>
+      <div class="card c-yellow" onclick="showScreen('screenSwCb')">
+        <div class="card-status" id="cardStatusSw"></div>
+        <span class="card-icon">⚡</span>
+        <div class="card-title">Свич/Комбо</div>
+
+      </div>
+      <div class="card c-green" onclick="showScreen('screenLoot')">
+        <div class="card-status" id="cardStatusLoot"></div>
+        <span class="card-icon">🎁</span>
+        <div class="card-title">Автолут</div>
+
+      </div>
+      <div class="card c-purple" onclick="showScreen('screenRadar')">
+        <div class="card-status" id="cardStatusRadar"></div>
+        <span class="card-icon">👁</span>
+        <div class="card-title">Радар</div>
+
+      </div>
+      <div class="card c-cyan" onclick="showScreen('screenWindow')">
+        <div class="card-status" id="cardStatusWin"></div>
+        <span class="card-icon">🖥</span>
+        <div class="card-title">Окно</div>
+
+      </div>
+    </div>
+    <div class="launch-bar">
+      <button class="btn btn-green btn-xl" id="btnStart" onclick="sendToAhk('TOGGLE_START')">▶ ЗАПУСТИТЬ</button>
+      <button class="btn btn-red btn-xl" id="btnStop" onclick="sendToAhk('STOP_ACTIVE')" disabled>⏹ СТОП</button>
+    </div>
+    <button class="btn btn-copy" onclick="openCopyModal()">📋 Копировать профиль…</button>
+    <button class="btn btn-copy" onclick="openMassModal()">⏯ Профили вкл/выкл…</button>
+  </div>
+
+  <div class="screen" id="screenRadar">
+    <div class="back-btn" onclick="showScreen('screenHome')">← Назад</div>
+    <div class="panel">
+      <div class="panel-header"><span class="panel-icon">👁</span><span class="panel-title purple">Радар (Авто-клик)</span></div>
+      <div class="panel-body">
+        <div class="form-row"><span class="form-label">Хоткей:</span><div class="hotkey-tag" id="hkRadar" tabindex="0" onclick="startRecording(this,'radarHotkey')">—</div></div>
+        <div class="divider"></div>
+        <div class="form-row"><span class="form-label">Цвет 1:</span><div class="pixel-status"><div class="pixel-dot" id="dRadC1"></div><div class="pixel-color-swatch" id="swRadC1"></div></div><button class="btn btn-purple btn-sm" onclick="startCapture('радар_цвет1')">📍</button><button class="btn btn-sm pixel-reset-btn" id="resetRadC1" onclick="resetPixel('радар_цвет1')" style="display:none;">✕</button></div>
+        <div class="form-row"><span class="form-label">Цвет 2:</span><div class="pixel-status"><div class="pixel-dot" id="dRadC2"></div><div class="pixel-color-swatch" id="swRadC2"></div></div><button class="btn btn-purple btn-sm" onclick="startCapture('радар_цвет2')">📍</button><button class="btn btn-sm pixel-reset-btn" id="resetRadC2" onclick="resetPixel('радар_цвет2')" style="display:none;">✕</button></div>
+        <div class="form-row"><span class="form-label">Цвет 3:</span><div class="pixel-status"><div class="pixel-dot" id="dRadC3"></div><div class="pixel-color-swatch" id="swRadC3"></div></div><button class="btn btn-purple btn-sm" onclick="startCapture('радар_цвет3')">📍</button><button class="btn btn-sm pixel-reset-btn" id="resetRadC3" onclick="resetPixel('радар_цвет3')" style="display:none;">✕</button></div>
+        <div class="divider"></div>
+        <div class="form-row"><span class="form-label">Область:</span><div class="pixel-status"><div class="pixel-dot" id="dRadA"></div><span id="radAreaLbl" style="color:var(--text3);font-size:10px;">не задана</span></div><button class="btn btn-cyan btn-sm" onclick="startCaptureArea()">📍 Задать</button><button class="btn btn-sm pixel-reset-btn" id="resetRadA" onclick="resetPixel('радар_зона')" style="display:none;">✕</button></div>
+        <div class="form-row"><span class="form-label">Рамка:</span><div class="toggle" id="togRadarFrame" onclick="sendToAhk('TOGGLE_RADAR_FRAME')"><div class="toggle-track"><div class="toggle-thumb"></div></div></div><span style="color:var(--text3);font-size:10px;margin-left:6px;">Показывать зону поиска на экране</span></div>
+        <div class="divider"></div>
+        <div class="tol-block">
+          <div class="tol-title">ДОПУСК ЦВЕТА (РАДАР)</div>
+          <div class="tol-row"><input type="range" id="radarTolerance" class="tol-slider" min="0" max="60" value="20" oninput="document.getElementById('radTolVal').textContent=this.value"><span class="tol-val" id="radTolVal">20</span></div>
+        </div>
+        <div class="form-row"><span class="form-label">Задержка:</span><input type="number" id="radarDelay" value="300" class="w70"><span style="color:var(--text3);">мс</span></div>
+        <div class="form-row"><span class="form-label">Смещение Y:</span><input type="number" id="radarOffY" value="5" class="w70"><span style="color:var(--text3);">пикс. вниз</span></div>
+        <div class="form-row"><span class="form-label">Разброс:</span><input type="number" id="radarRandom" value="0" class="w70"><span style="color:var(--text3);">± пикс.</span></div>
+        
+        <div class="divider"></div>
+        <div class="modal-section" style="color:var(--red);">Запретные зоны (исключения)</div>
+        <div class="form-row"><span class="form-label">Зона 1:</span><div class="pixel-status"><div class="pixel-dot" id="dEx1"></div></div><button class="btn btn-red btn-sm" onclick="startCaptureEx(1)">📍</button><button class="btn btn-sm pixel-reset-btn" id="resetEx1" onclick="resetPixel('искл1')" style="display:none;">✕</button></div>
+        <div class="form-row"><span class="form-label">Зона 2:</span><div class="pixel-status"><div class="pixel-dot" id="dEx2"></div></div><button class="btn btn-red btn-sm" onclick="startCaptureEx(2)">📍</button><button class="btn btn-sm pixel-reset-btn" id="resetEx2" onclick="resetPixel('искл2')" style="display:none;">✕</button></div>
+        <div class="form-row"><span class="form-label">Зона 3:</span><div class="pixel-status"><div class="pixel-dot" id="dEx3"></div></div><button class="btn btn-red btn-sm" onclick="startCaptureEx(3)">📍</button><button class="btn btn-sm pixel-reset-btn" id="resetEx3" onclick="resetPixel('искл3')" style="display:none;">✕</button></div>
+        <div class="form-row"><span class="form-label">Зона 4:</span><div class="pixel-status"><div class="pixel-dot" id="dEx4"></div></div><button class="btn btn-red btn-sm" onclick="startCaptureEx(4)">📍</button><button class="btn btn-sm pixel-reset-btn" id="resetEx4" onclick="resetPixel('искл4')" style="display:none;">✕</button></div>
+
+      </div>
+    </div>
+    <button class="btn btn-purple btn-full" onclick="saveAll()">💾 Сохранить</button>
+  </div>
+
+  <div class="screen" id="screenHeal">
+    <div class="back-btn" onclick="showScreen('screenHome')">← Назад</div>
+    <div class="two-col">
+      <div class="panel">
+        <div class="panel-header"><span class="panel-icon">💧</span><span class="panel-title cyan">Мана</span></div>
+        <div class="panel-body">
+          <div class="form-row"><span class="form-label">Пиксель:</span><div class="pixel-status"><div class="pixel-dot" id="dMana"></div><div class="pixel-color-swatch" id="swMana"></div></div><button class="btn btn-purple btn-sm" onclick="startCapture('мана')">📍</button><button class="btn btn-sm pixel-reset-btn" id="resetMana" onclick="resetPixel('мана')" style="display:none;">✕</button></div>
+          <div class="form-row"><span class="form-label">Клавиша:</span><input type="text" id="keyMana" value="" class="w40"></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><span class="panel-icon">❤</span><span class="panel-title red">HP 1</span></div>
+        <div class="panel-body">
+          <div class="form-row"><span class="form-label">Пиксель:</span><div class="pixel-status"><div class="pixel-dot" id="dHp1"></div><div class="pixel-color-swatch" id="swHp1"></div></div><button class="btn btn-purple btn-sm" onclick="startCapture('hp1')">📍</button><button class="btn btn-sm pixel-reset-btn" id="resetHp1" onclick="resetPixel('hp1')" style="display:none;">✕</button></div>
+          <div class="form-row"><span class="form-label">Клавиша:</span><input type="text" id="keyHp" value="" class="w40"></div>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-header"><span class="panel-icon">⏱</span><span class="panel-title cyan">Настройки</span></div>
+      <div class="panel-body">
+        <div class="form-row">
+          <span class="form-label">Приоритет:</span>
+          <button class="mage-cycle" id="healPriBtn" onclick="cycleHealPri()">Приоритет: HP</button>
+        </div>
+        <div class="form-row"><span class="form-label">Задержка:</span><input type="number" id="healDelay" value="" class="w70"><span style="color:var(--text3);">мс</span></div>
+        <div class="tol-block">
+          <div class="tol-title">ДОПУСК ЦВЕТА (HP / МАНА)</div>
+          <div class="tol-desc">Насколько сильно цвет пикселя может отличаться от захваченного. Если макрос не срабатывает — увеличь. Если срабатывает слишком часто — уменьши.</div>
+          <div class="tol-row"><input type="range" id="healTolerance" class="tol-slider" min="0" max="60" value="30" oninput="document.getElementById('healTolVal').textContent=this.value"><span class="tol-val" id="healTolVal">30</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-header"><span class="panel-icon">🛡</span><span class="panel-title red">Режим воина</span></div>
+      <div class="panel-body">
+        <div class="form-row"><span class="form-label">Пиксель HP2:</span><div class="pixel-status"><div class="pixel-dot" id="dHp2"></div><div class="pixel-color-swatch" id="swHp2"></div></div><button class="btn btn-purple btn-sm" onclick="startCapture('hp2')">📍</button><button class="btn btn-sm pixel-reset-btn" id="resetHp2" onclick="resetPixel('hp2')" style="display:none;">✕</button></div>
+        <div class="form-row"><span class="form-label">Включить:</span><div class="toggle" id="togHp2" onclick="sendToAhk('TOGGLE_HP2')"><div class="toggle-track"><div class="toggle-thumb"></div></div></div></div>
+        <div class="form-row"><span class="form-label">Клавиша:</span><input type="text" id="keyWarrior" value="" class="w40"></div>
+      </div>
+    </div>
+    <button class="btn btn-cyan btn-full" onclick="saveAll()">💾 Сохранить</button>
+  </div>
+
+  <div class="screen" id="screenLoot">
+    <div class="back-btn" onclick="showScreen('screenHome')">← Назад</div>
+    <div class="panel">
+      <div class="panel-header"><span class="panel-icon">🎁</span><span class="panel-title green">Автоподбор</span></div>
+      <div class="panel-body">
+        <div class="form-row"><span class="form-label">Автолут:</span><div class="toggle on" id="togLoot" onclick="sendToAhk('TOGGLE_LOOT')"><div class="toggle-track"><div class="toggle-thumb"></div></div><span class="toggle-label" id="lootLbl">ВКЛ</span></div></div>
+        <div class="divider"></div>
+        <div class="form-row"><span class="form-label">Пиксель:</span><div class="pixel-status"><div class="pixel-dot" id="dLoot"></div><div class="pixel-color-swatch" id="swLoot"></div></div><button class="btn btn-purple btn-sm" onclick="startCapture('лут')">📍</button><button class="btn btn-sm pixel-reset-btn" id="resetLoot" onclick="resetPixel('лут')" style="display:none;">✕</button></div>
+        <div class="form-row"><span class="form-label">Кнопка:</span><input type="text" id="keyLoot" value="" class="w40"><span style="color:var(--text2);margin:0 6px;font-size:10px;">Кол. нажатий:</span><input type="number" id="lootPresses" value="3" min="1" max="10" class="w40"></div>
+        <div class="divider"></div>
+        <div class="tol-block">
+          <div class="tol-title">ДОПУСК ЦВЕТА (ЛУТ)</div>
+          <div class="tol-desc">Чувствительность определения появления лута. Увеличь если лут не подбирается, уменьши если подбирается вхолостую.</div>
+          <div class="tol-row"><input type="range" id="lootTolerance" class="tol-slider" min="0" max="60" value="20" oninput="document.getElementById('lootTolVal').textContent=this.value"><span class="tol-val" id="lootTolVal">20</span></div>
+        </div>
+        <div class="form-row"><span class="form-label">Зад. нажатия:</span><input type="number" id="lootPressDelay" value="80" class="w60"><span style="color:var(--text3);">мс</span></div>
+        <div class="form-row"><span class="form-label">Зад. после:</span><input type="number" id="lootWaitDelay" value="300" class="w60"><span style="color:var(--text3);">мс</span></div>
+      </div>
+    </div>
+    <button class="btn btn-green btn-full" onclick="saveAll()">💾 Сохранить</button>
+  </div>
+
+  <div class="screen" id="screenSwCb">
+    <div class="back-btn" onclick="showScreen('screenHome')">← Назад</div>
+    
+    <div class="panel">
+      <div class="panel-header"><span class="panel-icon">⚡</span><span class="panel-title yellow">Свич</span></div>
+      <div class="panel-body">
+        <div class="form-row"><span class="form-label">Хоткей:</span><div class="hotkey-tag" id="hkSw" tabindex="0" onclick="startRecording(this,'swHotkey')">—</div></div>
+        <div class="form-row" style="gap:6px;"><span style="color:var(--text3);">К1:</span><input type="text" id="swClass1" value="" class="w40"><span style="color:var(--text3);">Ул:</span><input type="text" id="swUlt" value="" class="w40"><span style="color:var(--text3);">К2:</span><input type="text" id="swClass2" value="" class="w40"></div>
+        <div class="form-row"><span class="form-label">Зад. К1:</span><input type="number" id="swC1D" value="30" class="w60"><span style="color:var(--text3);margin-right:8px;">мс</span><span class="form-label">Зад. Ул:</span><input type="number" id="swUD" value="30" class="w60"><span style="color:var(--text3);">мс</span></div>
+        <div class="form-row"><span class="form-label">Зад. К2:</span><input type="number" id="swC2D" value="1000" class="w60"><span style="color:var(--text3);">мс</span></div>
+        <div class="form-row"><span class="form-label">Режим:</span><button class="mage-cycle" id="swModeBtn" onclick="cycleSwMageMode()">Обычный (К1→Ул→К2)</button></div>
+        <div class="form-row" id="swMageDelayRow" style="display:none;"><span class="form-label">Зад. ЛКМ:</span><input type="number" id="swMageDelay" value="100" class="w60"><span style="color:var(--text3);">мс (пауза ЛКМ → К2)</span></div>
+        <div class="divider"></div>
+        <div class="form-row">
+            <span class="form-label">Бафф:</span>
+            <div class="toggle" id="togSwBuff" onclick="sendToAhk('TOGGLE_SW_BUFF')"><div class="toggle-track"><div class="toggle-thumb"></div></div></div>
+            <span style="color:var(--text3);margin-left:6px;">Кн:</span><input type="text" id="swBuffKey" value="" class="w40">
+            <span style="color:var(--text3);margin-left:6px;">КД:</span><input type="number" id="swBuffDelay" value="20" class="w70"><span style="color:var(--text3);">сек</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="panel">
+      <div class="panel-header"><span class="panel-icon">🔥</span><span class="panel-title red">Комбо</span></div>
+      <div class="panel-body">
+        <div class="form-row"><span class="form-label">Хоткей:</span><div class="hotkey-tag" id="hkCb" tabindex="0" onclick="startRecording(this,'comboHotkey')">—</div></div>
+        <div class="form-row"><span class="form-label">Режим:</span><button class="mage-cycle" id="comboModeBtn" onclick="cycleComboMode()">Полный (К1→Ул→К2)</button></div>
+        <div class="form-row" id="cbMageDelayRow" style="display:none;"><span class="form-label">Зад. ЛКМ:</span><input type="number" id="cbMageDelay" value="100" class="w60"><span style="color:var(--text3);">мс (пауза ЛКМ → К2)</span></div>
+        <div class="form-row" style="gap:6px;"><span style="color:var(--text3);">К1:</span><input type="text" id="cbClass1" value="" class="w40"><span style="color:var(--text3);">Ул:</span><input type="text" id="cbUlt" value="" class="w40"><span style="color:var(--text3);">К2:</span><input type="text" id="cbClass2" value="" class="w40"></div>
+        <div class="form-row"><span class="form-label">Зад. К1:</span><input type="number" id="cbC1D" value="20" class="w60"><span style="color:var(--text3);margin-right:8px;">мс</span><span class="form-label">Зад. Ул:</span><input type="number" id="cbUD" value="20" class="w60"><span style="color:var(--text3);">мс</span></div>
+        <div class="form-row"><span class="form-label">Зад. К2:</span><input type="number" id="cbC2D" value="1500" class="w60"><span style="color:var(--text3);">мс</span></div>
+        <div class="divider"></div>
+        <div class="form-row">
+            <span class="form-label">Бафф:</span>
+            <div class="toggle" id="togCbBuff" onclick="sendToAhk('TOGGLE_CB_BUFF')"><div class="toggle-track"><div class="toggle-thumb"></div></div></div>
+            <span style="color:var(--text3);margin-left:6px;">Кн:</span><input type="text" id="cbBuffKey" value="" class="w40">
+            <span style="color:var(--text3);margin-left:6px;">КД:</span><input type="number" id="cbBuffDelay" value="20" class="w70"><span style="color:var(--text3);">сек</span>
+        </div>
+      </div>
+    </div>
+    
+    <button class="btn btn-yellow btn-full" onclick="saveAll()">💾 Сохранить</button>
+  </div>
+
+  <div class="screen" id="screenTag">
+    <div class="back-btn" onclick="showScreen('screenHome')">← Назад</div>
+    <div class="panel">
+      <div class="panel-header"><span class="panel-icon">🎯</span><span class="panel-title pink">Приват мобов</span><button class="tag-instr-btn" onclick="openTagInfo()">ИНСТРУКЦИЯ</button></div>
+      <div class="panel-body">
+        <div class="form-row"><span class="form-label">Хоткей:</span><div class="hotkey-tag" id="hkTag" tabindex="0" onclick="startRecording(this,'tagHotkey')">F10</div></div>
+        <div class="divider"></div>
+        <div class="modal-section">Класс / Ульты</div>
+        <div class="modal-row"><span class="modal-label">Класс 1:</span><input type="text" id="tagC1" value="" class="w40"><span class="modal-label">Задержка:</span><input type="number" id="tagC1D" value="100" class="w70"><span style="color:var(--text3);">мс</span></div>
+        <div class="modal-row"><span class="modal-label">Ульта 1:</span><input type="text" id="tagU1" value="" class="w40"><span class="modal-label">Задержка:</span><input type="number" id="tagU1D" value="100" class="w70"><span style="color:var(--text3);">мс</span></div>
+        <div class="modal-row"><span class="modal-label">Класс 2:</span><input type="text" id="tagC2" value="" class="w40"><span class="modal-label">Задержка:</span><input type="number" id="tagC2D" value="1000" class="w70"><span style="color:var(--text3);">мс</span></div>
+        <div class="modal-row"><span class="modal-label">Ульта 2:</span><input type="text" id="tagU2" value="" class="w40"><span class="modal-label">Задержка:</span><input type="number" id="tagU2D" value="100" class="w70"><span style="color:var(--text3);">мс</span></div>
+        <div class="divider"></div>
+        <div class="modal-section">Мобы</div>
+        <div class="modal-row"><span class="modal-label">Кнопки:</span><div class="mob-keys"><input type="text" id="mob1" value="" class="w40"><input type="text" id="mob2" value="" class="w40"><input type="text" id="mob3" value="" class="w40"><input type="text" id="mob4" value="" class="w40"></div></div>
+        <div class="modal-row"><span class="modal-label">Пауза:</span><input type="number" id="mobD" value="300" class="w70"><span style="color:var(--text3);">мс</span></div>
+        <div class="divider"></div>
+        <div class="modal-section">Маг</div>
+        <div class="modal-row"><span class="modal-label">Режим:</span><button class="mage-cycle" id="mageBtn" onclick="cycleMage()">Маг: Кл.1</button><span class="modal-label">Цель:</span><input type="text" id="mageAim" value="" class="w40"></div>
+        <div class="modal-row"><span class="modal-label">Пауза цели:</span><input type="number" id="mageD" value="100" class="w70"><span style="color:var(--text3);">мс</span></div>
+      </div>
+    </div>
+    <button class="btn btn-pink btn-full" onclick="saveAll()">💾 Сохранить</button>
+  </div>
+
+  <div class="screen" id="screenWindow">
+    <div class="back-btn" onclick="showScreen('screenHome')">← Назад</div>
+    <div class="panel">
+      <div class="panel-header"><span class="panel-icon">🖥</span><span class="panel-title cyan">Целевое окно</span></div>
+      <div class="panel-body">
+        <div class="form-row"><span class="form-label">Окно:</span><div class="win-display" id="winDisplay">не выбрано</div><button class="btn btn-cyan btn-sm" onclick="openWinModal()">⊕</button></div>
+        <div class="form-row"><span class="form-label">Хоткей:</span><div class="hotkey-tag" id="hkStart" tabindex="0" onclick="startRecording(this,'startHotkey')">F8</div></div>
+      </div>
+    </div>
+    <button class="btn btn-cyan btn-full" onclick="saveAll()">💾 Сохранить</button>
+  </div>
+
+</div>
+
+<div class="modal-overlay" id="winModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" style="color:var(--cyan)">🖥 ВЫБОР ОКНА</div>
+      <div class="modal-close" onclick="closeModal('winModal')">✕</div>
+    </div>
+    <div class="modal-body">
+      <div class="win-refresh"><button class="btn btn-cyan btn-sm" id="refreshBtn" onclick="sendToAhk('GET_WINDOWS')">🔄 Обновить</button></div>
+      <div class="win-list" id="winList"><div class="loading-overlay"><div class="spinner"></div>Загрузка...</div></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-cyan" id="winOkBtn" onclick="confirmWindow()" disabled>✓ Выбрать</button>
+      <button class="btn" style="border-color:var(--border2);color:var(--text2);" onclick="closeModal('winModal')">Отмена</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="copyModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" style="color:#818cf8;">📋 КОПИРОВАНИЕ ПРОФИЛЯ</div>
+      <div class="modal-close" onclick="closeModal('copyModal')">✕</div>
+    </div>
+    <div class="modal-body">
+      <div style="font-size:11px;color:var(--text2);line-height:1.5;">Настройки будут скопированы <b>из</b> выбранного профиля <b>в текущий — ПРОФИЛЬ <span id="copyDstLbl">1</span></b>.<br>Окно (эмулятор) текущего профиля не изменится.</div>
+      <div class="modal-section">Скопировать из:</div>
+      <div class="win-list" id="copyList"></div>
+      <label style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text2);cursor:pointer;padding:8px 10px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;">
+        <input type="checkbox" id="copyHotkeys" style="accent-color:#818cf8;">
+        Перенести и хоткеи (иначе останутся текущие)
+      </label>
+      <div style="font-size:10px;color:var(--text3);">Если у источника не сохранён профиль — копирование не найдёт файл.</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" style="border-color:#818cf8;color:#818cf8;" id="copyOkBtn" onclick="confirmCopy()" disabled>📋 Копировать</button>
+      <button class="btn" style="border-color:var(--border2);color:var(--text2);" onclick="closeModal('copyModal')">Отмена</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="massModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" style="color:var(--green)">⏯ ВКЛ / ВЫКЛ ПРОФИЛЕЙ</div>
+      <div class="modal-close" onclick="closeModal('massModal')">✕</div>
+    </div>
+    <div class="modal-body">
+      <div style="font-size:11px;color:var(--text2);line-height:1.5;">Отметь профили — по клавише снизу или кнопке они включаются/выключаются. Список и клавиша сохраняются.</div>
+      <div class="form-row"><span class="form-label">Клавиша:</span><div class="hotkey-tag" id="hkMass" tabindex="0" onclick="startRecording(this,'massToggle')">—</div></div>
+      <div class="form-row"><span class="form-label">Что переключать:</span>
+        <div class="mass-secs">
+          <label class="mass-sec"><input type="checkbox" id="secHeal" checked style="accent-color:#818cf8;" onchange="toggleMassSec()">❤ Хилл</label>
+          <label class="mass-sec"><input type="checkbox" id="secSw" checked style="accent-color:#818cf8;" onchange="toggleMassSec()">⚡ Свич</label>
+          <label class="mass-sec"><input type="checkbox" id="secRadar" checked style="accent-color:#818cf8;" onchange="toggleMassSec()">👁 Радар</label>
+        </div>
+      </div>
+      <div style="font-size:10px;color:var(--text3);margin-top:-4px;">Секции переключаются вместе со старт/стопом профиля.</div>
+      <div class="win-list" id="massList"></div>
+      <div id="massSummary" style="font-size:10px;color:var(--text3);">Ничего не выбрано</div>
+      <div style="font-size:10px;color:var(--text3);">Профиль без выбранного окна будет пропущен.</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" style="border-color:var(--green);color:var(--green);white-space:nowrap;" id="massOkBtn" onclick="confirmMass()" disabled>⏯ Вкл/выкл выбранные</button>
+      <button class="btn" style="border-color:var(--border2);color:var(--text2);" onclick="closeModal('massModal')">Отмена</button>
+    </div>
+  </div>
+</div>
+
+<div id="captureOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:200;align-items:center;justify-content:center;flex-direction:column;gap:12px;">
+  <div style="background:var(--panel);border:2px solid var(--cyan);border-radius:14px;padding:20px 28px;text-align:center;box-shadow:0 0 40px rgba(0,212,255,0.3);max-width:360px;width:90%;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+      <div style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;letter-spacing:2px;color:var(--cyan);">📍 ЗАХВАТ ТОЧКИ</div>
+      <div onclick="cancelCapture()" style="width:24px;height:24px;border-radius:5px;background:rgba(255,255,255,0.04);border:1px solid var(--border2);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text2)'">✕</div>
+    </div>
+    <div id="captureHint" style="font-size:13px;color:var(--yellow);font-weight:600;margin-bottom:10px;"></div>
+
+    <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:12px;">
+      <div style="font-size:9px;color:var(--text3);letter-spacing:2px;margin-bottom:6px;font-family:'Rajdhani',sans-serif;">ЛУПА — НАВЕДИ И НАЖМИ ПРОБЕЛ</div>
+      <canvas id="loupeCanvas" width="198" height="198" style="border-radius:8px;border:1px solid var(--border2);image-rendering:pixelated;"></canvas>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+        <div id="loupeSwatch" style="width:16px;height:16px;border-radius:3px;border:1px solid var(--border2);background:#000;flex-shrink:0;"></div>
+        <span id="loupeHex" style="font-size:11px;color:var(--cyan);font-family:'Share Tech Mono',monospace;">—</span>
+      </div>
+    </div>
+
+    <div id="captureTips" style="text-align:left;margin-bottom:12px;display:flex;flex-direction:column;gap:6px;"></div>
+    <button onclick="cancelCapture()" style="padding:6px 28px;border-radius:7px;border:1px solid rgba(255,68,102,0.4);background:rgba(255,68,102,0.07);color:var(--red);cursor:pointer;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;" onmouseover="this.style.background='rgba(255,68,102,0.18)'" onmouseout="this.style.background='rgba(255,68,102,0.07)'">✕ ОТМЕНА</button>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+function sendToAhk(msg) {
+  if (window.chrome && window.chrome.webview) {
+    window.chrome.webview.postMessage(msg);
+  }
+}
+
+let capturingAreaStep = 0;
+let capturingExStep = 0;
+let capturingExId = 0;
+
+if (window.chrome && window.chrome.webview) {
+  window.chrome.webview.addEventListener('message', e => {
+    const msg   = e.data;
+    const pipe  = msg.indexOf('|');
+    const cmd   = pipe === -1 ? msg : msg.substring(0, pipe);
+    const data  = pipe === -1 ? '' : msg.substring(pipe + 1);
+
+    if (cmd === 'PROFILE')      { applyProfile(JSON.parse(data)); }
+    else if (cmd === 'STATE')   { applyState(JSON.parse(data)); }
+    else if (cmd === 'MASS')    { applyMass(data); }
+    else if (cmd === 'WINDOWS') { renderWindows(JSON.parse(data)); }
+    else if (cmd === 'TAG_FIRED') { startTagTimer(); }
+    else if (cmd === 'LOUPE') {
+      var parts2 = data.split('|');
+      drawLoupe(parts2[2]); 
+    }
+    else if (cmd === 'LOUPE_STOP') { }
+    else if (cmd === 'TOAST')   { showToast(data, 'success'); }
+    else if (cmd === 'CAPTURE_WAIT') { showCaptureOverlay(data); }
+    else if (cmd === 'CAPTURE_DONE') { 
+      const typeArg = data.split('|')[0];
+      if (typeArg === 'радар_точка1' && capturingAreaStep === 1) {
+        capturingAreaStep = 2;
+        setTimeout(() => sendToAhk('CAPTURE|радар_точка2'), 200);
+      } else if (typeArg.match(/^искл\d_1$/) && capturingExStep === 1) {
+        capturingExStep = 2;
+        setTimeout(() => sendToAhk('CAPTURE|искл' + capturingExId + '_2'), 200);
+      } else {
+        capturingAreaStep = 0;
+        capturingExStep = 0;
+        hideCaptureOverlay(); 
+      }
+    }
+    else if (cmd === 'SWITCH_TAB')  {
+      const id = parseInt(data);
+      activeTab = id;
+      for(let i=1; i<=4; i++) {
+          const t = document.getElementById('tab'+i);
+          if (t) t.classList.toggle('active', id===i);
+      }
+    }
+  });
+}
+
+setTimeout(() => sendToAhk('READY'), 300);
+
+let activeTab = 1;
+let lastState = {};
+let mageMode  = 1;
+let healPriority = 1;
+let comboMode = 1;
+let selectedHwnd = null;
+let recordingEl  = null;
+
+const profiles = {
+  1: { hk:{start:'F8',tag:'F10',sw:'',combo:'',radar:''}, isSw:false, isCb:false },
+  2: { hk:{start:'F9',tag:'F11',sw:'',combo:'',radar:''}, isSw:false, isCb:false },
+  3: { hk:{start:'',tag:'',sw:'',combo:'',radar:''}, isSw:false, isCb:false },
+  4: { hk:{start:'',tag:'',sw:'',combo:'',radar:''}, isSw:false, isCb:false }
+};
+
+function updateHealPriBtn() {
+  const btn = document.getElementById('healPriBtn');
+  if (btn) btn.textContent = healPriority === 1 ? 'Приоритет: HP' : 'Приоритет: МАНА';
+}
+function cycleHealPri() {
+  healPriority = healPriority === 1 ? 2 : 1;
+  updateHealPriBtn();
+}
+
+function updateComboModeBtn() {
+  const btn = document.getElementById('comboModeBtn');
+  if (btn) btn.textContent = comboMode === 1 ? 'Полный (К1→Ул→К2)'
+    : (comboMode === 2 ? 'Только Ульта' : 'Маг (К1→Ул→ЛКМ→К2)');
+  const row = document.getElementById('cbMageDelayRow');
+  if (row) row.style.display = comboMode === 3 ? '' : 'none';
+}
+function cycleComboMode() {
+  comboMode = comboMode === 1 ? 2 : (comboMode === 2 ? 3 : 1);
+  updateComboModeBtn();
+}
+
+let swMageMode = 0;
+const SW_MODE_LABELS = ['Обычный (К1→Ул→К2)', 'Маг (К1→Ул→ЛКМ→К2)', 'Маг ×1 (один цикл)'];
+function updateSwModeBtn() {
+  const btn = document.getElementById('swModeBtn');
+  if (btn) btn.textContent = SW_MODE_LABELS[swMageMode] || SW_MODE_LABELS[0];
+  const row = document.getElementById('swMageDelayRow');
+  if (row) row.style.display = swMageMode ? '' : 'none';
+}
+function cycleSwMageMode() {
+  swMageMode = swMageMode >= 2 ? 0 : swMageMode + 1;
+  updateSwModeBtn();
+}
+
+function startCaptureArea() {
+  capturingAreaStep = 1;
+  sendToAhk('CAPTURE|радар_точка1');
+}
+
+function startCaptureEx(id) {
+  capturingExStep = 1;
+  capturingExId = id;
+  sendToAhk('CAPTURE|искл' + id + '_1');
+}
+
+function applyProfile(d) {
+  const id = d.id || activeTab;
+  const p  = profiles[id];
+
+  p.hk.start = d.hotkeyStart || '';
+  p.hk.tag   = d.hotkeyTag   || '';
+  p.hk.sw    = d.swHotkey    || '';
+  p.hk.combo = d.comboHotkey || '';
+  p.hk.radar = d.radarHotkey || '';
+
+  if (id === activeTab) {
+    setVal('keyMana',    d.keyMana);
+    setVal('keyHp',      d.keyHp);
+    setVal('keyWarrior', d.keyWarrior);
+    setVal('keyLoot',    d.keyLoot);
+    setVal('healDelay',  d.healDelay);
+    
+    healPriority = d.healPriority || 1;
+    updateHealPriBtn();
+    
+    comboMode = d.comboMode || 1;
+    updateComboModeBtn();
+    setVal('cbMageDelay', d.cbMageDelay);
+    
+    swMageMode = d.swMageMode === true ? 1 : (parseInt(d.swMageMode, 10) || 0);
+    updateSwModeBtn();
+    setVal('swMageDelay', d.swMageDelay);
+    
+    if (d.healTolerance!==undefined){var hs=document.getElementById('healTolerance');if(hs){hs.value=d.healTolerance;document.getElementById('healTolVal').textContent=d.healTolerance;}}
+    if (d.lootTolerance!==undefined){var ls=document.getElementById('lootTolerance');if(ls){ls.value=d.lootTolerance;document.getElementById('lootTolVal').textContent=d.lootTolerance;}}
+    
+    if (d.radarTolerance!==undefined){var rts=document.getElementById('radarTolerance');if(rts){rts.value=d.radarTolerance;document.getElementById('radTolVal').textContent=d.radarTolerance;}}
+    setVal('radarDelay', d.radarDelay);
+    setVal('radarOffY',  d.radarOffY);
+    setVal('radarRandom', d.radarRandom);
+    setToggle('togRadarFrame', d.radarShow);
+    
+    setPx('dRadC1','',d.radarC1Ok, d.radarC1);
+    setPx('dRadC2','',d.radarC2Ok, d.radarC2);
+    setPx('dRadC3','',d.radarC3Ok, d.radarC3);
+    setPx('dRadA','',d.radarAreaOk, null);
+    
+    setPx('dEx1','',d.ex1Ok, null);
+    setPx('dEx2','',d.ex2Ok, null);
+    setPx('dEx3','',d.ex3Ok, null);
+    setPx('dEx4','',d.ex4Ok, null);
+    
+    if(document.getElementById('radAreaLbl')) document.getElementById('radAreaLbl').textContent = d.radarAreaOk ? 'Задана' : 'не задана';
+
+    setVal('lootPresses',    d.lootPresses);
+    setVal('lootPressDelay', d.lootPressDelay);
+    setVal('lootWaitDelay',  d.lootWaitDelay);
+    
+    setVal('swClass1', d.swClass1);
+    setVal('swUlt',    d.swUlt);
+    setVal('swClass2', d.swClass2);
+    setVal('swC1D',    d.swClass1Delay);
+    setVal('swUD',     d.swUltDelay);
+    setVal('swC2D',    d.swClass2Delay);
+    
+    setVal('swBuffKey', d.swBuffKey);
+    setVal('swBuffDelay', d.swBuffDelay);
+    setToggle('togSwBuff', d.swBuffEnabled);
+
+    setVal('cbClass1', d.comboClass1);
+    setVal('cbUlt',    d.comboUlt);
+    setVal('cbClass2', d.comboClass2);
+    setVal('cbC1D',    d.comboC1D);
+    setVal('cbUD',     d.comboUD);
+    setVal('cbC2D',    d.comboC2D);
+    
+    setVal('cbBuffKey', d.cbBuffKey);
+    setVal('cbBuffDelay', d.cbBuffDelay);
+    setToggle('togCbBuff', d.cbBuffEnabled);
+    
+    setVal('tagC1',  d.tagClass1);    setVal('tagC1D', d.tagClass1Delay);
+    setVal('tagU1',  d.tagUlt1);      setVal('tagU1D', d.tagUlt1Delay);
+    setVal('tagC2',  d.tagClass2);    setVal('tagC2D', d.tagClass2Delay);
+    setVal('tagU2',  d.tagUlt2);      setVal('tagU2D', d.tagUlt2Delay);
+    setVal('mob1', d.mob1); setVal('mob2', d.mob2);
+    setVal('mob3', d.mob3); setVal('mob4', d.mob4);
+    setVal('mobD', d.mobDelay);
+    setVal('mageAim', d.mageAim);
+    setVal('mageD',   d.mageAimDelay);
+    mageMode = d.mageMode || 1;
+    updateMageBtn();
+
+    setText('hkStart', d.hotkeyStart || '—');
+    setText('hkTag',   d.hotkeyTag   || '—');
+    setText('hkSw',    d.swHotkey    || '—');
+    setText('hkCb',    d.comboHotkey || '—');
+    setText('hkRadar', d.radarHotkey || '—');
+
+    setPx('dMana','lMana',d.manaOk,d.manaColor);
+    setPx('dHp1','lHp1',d.hp1Ok,d.hp1Color);
+    setPx('dHp2','lHp2',d.hp2Ok,d.hp2Color);
+    setPx('dLoot','lLoot',d.lootOk,d.lootColor);
+
+    setToggle('togHp2',  d.hp2Enabled);
+    setToggle2('togLoot', d.lootEnabled, 'lootLbl');
+
+    const wd = document.getElementById('winDisplay');
+    if (d.winTitle && d.winTitle !== '') {
+      wd.textContent = d.winTitle; wd.classList.add('ok');
+    } else {
+      wd.textContent = 'не выбрано'; wd.classList.remove('ok');
+    }
+  }
+  
+  if (d.winTitle) {
+      var t = document.getElementById('tabWin' + id);
+      if(t) t.textContent = d.winTitle.substring(0,18);
+  }
+
+  p.isSw = d.isSw;
+  p.isCb = d.isCb;
+  if(id === activeTab) updateCardStatuses(d);
+}
+
+function applyState(s) {
+  lastState = s;
+  for(let i=1; i<=4; i++) {
+      const b = document.getElementById('tabBadge'+i);
+      if(b) {
+          b.textContent = s['p'+i+'_run'] ? '▶ РАБОТАЕТ' : '⏹ СТОП';
+          b.classList.toggle('running', s['p'+i+'_run']);
+      }
+  }
+
+  const set = (id, text, on) => { const e=document.getElementById(id); e.textContent=text; e.classList.toggle('on', on); };
+  set('sStat', s.active_run ? '▶ Активен' : '⏹', s.active_run);
+  set('sSw',   s.active_sw  ? '⚡ ВКЛ' : 'ВЫКЛ',  s.active_sw);
+  set('sCb',   s.active_cb  ? '🔥 ВКЛ' : 'ВЫКЛ',  s.active_cb);
+  set('sRad',  s.active_radar ? '👁 ВКЛ' : 'ВЫКЛ', s.active_radar);
+
+  document.getElementById('btnStart').disabled = s.active_run;
+  document.getElementById('btnStop').disabled  = !s.active_run;
+}
+
+function setVal(id, val) { const el = document.getElementById(id); if (el && val !== undefined && val !== null) { el.value = val; } }
+function setText(id, val) { const el = document.getElementById(id); if (el && val !== undefined) { el.textContent = val; } }
+function setPx(dotId, lblId, ok, colorHex) {
+  const d = document.getElementById(dotId); if (d) d.classList.toggle('ok', !!ok);
+  const resetMap = {dMana:'resetMana',dHp1:'resetHp1',dHp2:'resetHp2',dLoot:'resetLoot', dRadC1:'resetRadC1', dRadC2:'resetRadC2', dRadC3:'resetRadC3', dRadA:'resetRadA', dEx1:'resetEx1', dEx2:'resetEx2', dEx3:'resetEx3', dEx4:'resetEx4'};
+  const swapMap  = {dMana:'swMana',   dHp1:'swHp1',   dHp2:'swHp2',   dLoot:'swLoot', dRadC1:'swRadC1', dRadC2:'swRadC2', dRadC3:'swRadC3'};
+  const rb = document.getElementById(resetMap[dotId]); if (rb) rb.style.display = ok ? 'inline-flex' : 'none';
+  const sw = document.getElementById(swapMap[dotId]);
+  if (sw) {
+    if (ok && colorHex) {
+      var hex = colorHex.replace(/^0[xX]/,'');
+      if (hex.length === 6) { sw.style.background='#'+hex; sw.style.display='block'; sw.title='#'+hex.toUpperCase(); }
+    } else { sw.style.display='none'; }
+  }
+}
+function setToggle(id, on) { const el = document.getElementById(id); if (el) el.classList.toggle('on', !!on); }
+function setToggle2(id, on, lblId) {
+  setToggle(id, on);
+  const lb = document.getElementById(lblId); if (lb) { lb.textContent = on ? 'ВКЛ' : 'ВЫКЛ'; }
+}
+
+function updateCardStatuses(d) {
+  const setCs = (id, ok) => { const e=document.getElementById(id); if(e){e.classList.toggle('ok',!!ok);e.classList.remove('on');} };
+  const setOn = (id, on) => { const e=document.getElementById(id); if(e){e.classList.toggle('on',!!on);if(on)e.classList.remove('ok');} };
+  if (!d) { return; }
+  setCs('cardStatusHeal',    d.manaOk || d.hp1Ok);
+  setCs('cardStatusLoot',    d.lootOk);
+  
+  const p = profiles[activeTab];
+  if (d.isRadar) { setOn('cardStatusRadar', true); } else { setCs('cardStatusRadar', !!(p.hk.radar && p.hk.radar !== '—')); }
+  setCs('cardStatusWin',     !!(d.winTitle && d.winTitle !== ''));
+  setCs('cardStatusTag',     !!(p.hk.tag && p.hk.tag !== '—'));
+  if (d.isSw || d.isCb) { setOn('cardStatusSw', true); } else { setCs('cardStatusSw', !!(p.hk.sw && p.hk.sw !== '—') || !!(p.hk.combo && p.hk.combo !== '—')); }
+}
+
+function updateMageBtn() { const btn = document.getElementById('mageBtn'); if (btn) { btn.textContent = mageMode === 1 ? 'Маг: Кл.1' : (mageMode === 2 ? 'Маг: Кл.2' : 'ВЫКЛ'); } }
+function cycleMage() { mageMode = (mageMode % 3) + 1; updateMageBtn(); }
+
+function saveAll() {
+  const g = id => { const e = document.getElementById(id); return e ? e.value.trim() : ''; };
+  const gt = id => { const e = document.getElementById(id); return e ? e.textContent.trim() : ''; };
+
+  const payload = {
+    keyMana: g('keyMana'), keyHp: g('keyHp'), keyWarrior: g('keyWarrior'), keyLoot: g('keyLoot'),
+    hotkeyStart: gt('hkStart'), hotkeyTag: gt('hkTag'), swHotkey: gt('hkSw'), comboHotkey: gt('hkCb'), radarHotkey: gt('hkRadar'),
+    swClass1: g('swClass1'), swClass1Delay: g('swC1D'), swUlt: g('swUlt'), swUltDelay: g('swUD'),
+    swClass2: g('swClass2'), swClass2Delay: g('swC2D'), swMageMode: swMageMode, swMageDelay: g('swMageDelay'),
+    swBuffKey: g('swBuffKey'), swBuffDelay: g('swBuffDelay'),
+    comboClass1: g('cbClass1'), comboC1D: g('cbC1D'), comboUlt: g('cbUlt'), comboUD: g('cbUD'),
+    comboClass2: g('cbClass2'), comboC2D: g('cbC2D'),
+    cbBuffKey: g('cbBuffKey'), cbBuffDelay: g('cbBuffDelay'),
+    healPriority: healPriority, comboMode: comboMode, cbMageDelay: g('cbMageDelay'),
+    radarTolerance: g('radarTolerance'), radarDelay: g('radarDelay'), radarOffY: g('radarOffY') || 0, radarRandom: g('radarRandom') || 0,
+    healDelay: g('healDelay'), healTolerance: g('healTolerance'),
+    lootTolerance: g('lootTolerance'), lootPresses: g('lootPresses'), lootPressDelay: g('lootPressDelay'), lootWaitDelay: g('lootWaitDelay'),
+    tagClass1: g('tagC1'), tagClass1Delay: g('tagC1D'), tagUlt1: g('tagU1'), tagUlt1Delay: g('tagU1D'),
+    tagClass2: g('tagC2'), tagClass2Delay: g('tagC2D'), tagUlt2: g('tagU2'), tagUlt2Delay: g('tagU2D'),
+    mob1: g('mob1'), mob2: g('mob2'), mob3: g('mob3'), mob4: g('mob4'),
+    mobDelay: g('mobD'), mageMode: mageMode, mageAim: g('mageAim'), mageAimDelay: g('mageD')
+  };
+
+  for (const k in payload) { if (payload[k] === '—') { payload[k] = ''; } }
+  sendToAhk('SAVE|' + JSON.stringify(payload));
+}
+
+function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+function switchTab(id) {
+  activeTab = id; 
+  for(let i=1; i<=4; i++) {
+      const t = document.getElementById('tab'+i);
+      if(t) t.classList.toggle('active', id===i);
+  }
+  sendToAhk('SWITCH_TAB|' + id);
+}
+
+function startCapture(type) { sendToAhk('CAPTURE|' + type); }
+function showCaptureOverlay(type) {
+  const hints = {
+    'мана':'Наведи на полоску МАНЫ и нажми ПРОБЕЛ',
+    'hp1':'Наведи на полоску HP и нажми ПРОБЕЛ',
+    'hp2':'Наведи на полоску HP (точка 2) и нажми ПРОБЕЛ',
+    'лут':'Наведи на пиксель ЛУТА и нажми ПРОБЕЛ',
+    'радар_цвет1':'Наведи на ПИКСЕЛЬ ЦЕЛИ 1 и нажми ПРОБЕЛ',
+    'радар_цвет2':'Наведи на ПИКСЕЛЬ ЦЕЛИ 2 и нажми ПРОБЕЛ',
+    'радар_цвет3':'Наведи на ПИКСЕЛЬ ЦЕЛИ 3 и нажми ПРОБЕЛ',
+    'радар_точка1':'Наведи на ЛЕВЫЙ ВЕРХНИЙ угол зоны поиска и нажми ПРОБЕЛ',
+    'радар_точка2':'Наведи на ПРАВЫЙ НИЖНИЙ угол зоны поиска и нажми ПРОБЕЛ',
+    'искл1_1':'Наведи на ЛЕВЫЙ ВЕРХНИЙ угол ЗАПРЕТНОЙ ЗОНЫ 1 и нажми ПРОБЕЛ',
+    'искл1_2':'Наведи на ПРАВЫЙ НИЖНИЙ угол ЗАПРЕТНОЙ ЗОНЫ 1 и нажми ПРОБЕЛ',
+    'искл2_1':'Наведи на ЛЕВЫЙ ВЕРХНИЙ угол ЗАПРЕТНОЙ ЗОНЫ 2 и нажми ПРОБЕЛ',
+    'искл2_2':'Наведи на ПРАВЫЙ НИЖНИЙ угол ЗАПРЕТНОЙ ЗОНЫ 2 и нажми ПРОБЕЛ',
+    'искл3_1':'Наведи на ЛЕВЫЙ ВЕРХНИЙ угол ЗАПРЕТНОЙ ЗОНЫ 3 и нажми ПРОБЕЛ',
+    'искл3_2':'Наведи на ПРАВЫЙ НИЖНИЙ угол ЗАПРЕТНОЙ ЗОНЫ 3 и нажми ПРОБЕЛ',
+    'искл4_1':'Наведи на ЛЕВЫЙ ВЕРХНИЙ угол ЗАПРЕТНОЙ ЗОНЫ 4 и нажми ПРОБЕЛ',
+    'искл4_2':'Наведи на ПРАВЫЙ НИЖНИЙ угол ЗАПРЕТНОЙ ЗОНЫ 4 и нажми ПРОБЕЛ'
+  };
+  document.getElementById('captureHint').textContent = hints[type] || ('Наведи и нажми ПРОБЕЛ');
+  document.getElementById('captureOverlay').style.display = 'flex';
+}
+function hideCaptureOverlay() { document.getElementById('captureOverlay').style.display = 'none'; }
+function cancelCapture() { hideCaptureOverlay(); sendToAhk('CAPTURE_CANCEL'); }
+function resetPixel(type) { sendToAhk('RESET_PIXEL|' + type); }
+
+function openWinModal() { sendToAhk('GET_WINDOWS'); }
+function renderWindows(wins) {
+  const list = document.getElementById('winList'); selectedHwnd = null; document.getElementById('winOkBtn').disabled = true;
+  if (!wins || wins.length === 0) { list.innerHTML = '<div class="loading-overlay">Окна не найдены</div>'; } else {
+    list.innerHTML = wins.map(w => {
+      const emuColors = {nox:'#00d4ff', ld:'#00ff88', bs:'#ff8800', memu:'#ff44ff'};
+      const emu = w.emu ? `<span style="font-size:9px;color:${emuColors[w.emu]||'#ffaa00'};border:1px solid ${emuColors[w.emu]||'#ffaa00'};border-radius:2px;padding:0 3px;flex-shrink:0;">${w.emu.toUpperCase()}</span>` : '';
+      return `<div class="win-item" onclick="selectWin(this,${w.hwnd})">${emu}<div style="overflow:hidden;min-width:0;"><span class="win-item-title">${w.title}</span><div class="win-item-pid">PID: ${w.pid ?? '—'} &nbsp;·&nbsp; HWND: ${w.hwnd}</div></div></div>`;
+    }).join('');
+  }
+  document.getElementById('winModal').classList.add('open');
+}
+function selectWin(el, hwnd) { document.querySelectorAll('.win-item').forEach(e => e.classList.remove('selected')); el.classList.add('selected'); selectedHwnd = hwnd; document.getElementById('winOkBtn').disabled = false; }
+function confirmWindow() { if (!selectedHwnd) { return; } sendToAhk('SET_WINDOW|' + selectedHwnd); closeModal('winModal'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// --- Копирование профиля ---
+let copySrc = null;
+function openCopyModal() {
+  copySrc = null;
+  document.getElementById('copyDstLbl').textContent = activeTab;
+  document.getElementById('copyOkBtn').disabled = true;
+  const list = document.getElementById('copyList');
+  list.innerHTML = '';
+  for (let i = 1; i <= 4; i++) {
+    if (i === activeTab) { continue; }
+    const winTxt = (document.getElementById('tabWin' + i) || {}).textContent || 'не выбрано';
+    const div = document.createElement('div');
+    div.className = 'win-item';
+    div.innerHTML = '<span class="win-item-title">ПРОФИЛЬ ' + i + '</span><div class="win-item-pid">' + winTxt + '</div>';
+    div.onclick = () => { list.querySelectorAll('.win-item').forEach(e => e.classList.remove('selected')); div.classList.add('selected'); copySrc = i; document.getElementById('copyOkBtn').disabled = false; };
+    list.appendChild(div);
+  }
+  document.getElementById('copyModal').classList.add('open');
+}
+function confirmCopy() {
+  if (!copySrc) { return; }
+  const hk = document.getElementById('copyHotkeys').checked ? '1' : '0';
+  sendToAhk('COPY_PROFILE|' + copySrc + '|' + hk);
+  closeModal('copyModal');
+}
+
+// --- Массовое вкл/выкл профилей ---
+let massSel = new Set();
+let massKey = '';
+let massIds = [1, 2, 3, 4];
+let massSecs = new Set(['heal', 'switch', 'radar']);
+function applyMass(data) {
+  const p = data.split('|');
+  massKey = p[0] || '';
+  massIds = (p[1] || '').split(',').map(s => parseInt(s, 10)).filter(n => n >= 1 && n <= 4);
+  if (!massIds.length) { massIds = [1, 2, 3, 4]; }
+  if (p.length >= 3) {
+    massSecs = new Set((p[2] || '').split(',').filter(s => ['heal', 'switch', 'radar'].includes(s)));
+  }
+  syncMassSecs();
+  const hk = document.getElementById('hkMass');
+  if (hk) { hk.textContent = massKey || '—'; }
+}
+function syncMassSecs() {
+  const map = { heal: 'secHeal', switch: 'secSw', radar: 'secRadar' };
+  for (const sec in map) {
+    const el = document.getElementById(map[sec]);
+    if (el) { el.checked = massSecs.has(sec); }
+  }
+}
+function toggleMassSec() {
+  const map = { secHeal: 'heal', secSw: 'switch', secRadar: 'radar' };
+  massSecs = new Set();
+  for (const id in map) {
+    const el = document.getElementById(id);
+    if (el && el.checked) { massSecs.add(map[id]); }
+  }
+  sendToAhk('SET_SECTIONS|' + [...massSecs].join(','));
+}
+function saveMass() {
+  const hk = document.getElementById('hkMass');
+  massKey = (hk ? hk.textContent.trim() : '—') === '—' ? '' : (hk ? hk.textContent.trim() : '');
+  sendToAhk('SET_MASS|' + massKey + '|' + [...massSel].sort((a, b) => a - b).join(','));
+}
+function openMassModal() {
+  massSel = new Set(massIds);
+  syncMassSecs();
+  const hk = document.getElementById('hkMass');
+  if (hk) { hk.textContent = massKey || '—'; }
+  const list = document.getElementById('massList');
+  list.innerHTML = '';
+  for (let i = 1; i <= 4; i++) {
+    const run = !!lastState['p' + i + '_run'];
+    const winTxt = (document.getElementById('tabWin' + i) || {}).textContent || 'не выбрано';
+    const div = document.createElement('div');
+    div.className = 'win-item';
+    div.innerHTML = '<span class="win-item-title">ПРОФИЛЬ ' + i + '</span>' +
+      '<div class="win-item-pid">' + winTxt + '</div>' +
+      '<div class="mass-chk"><input type="checkbox" id="massChk' + i + '" style="accent-color:#818cf8;"><span class="mass-state' + (run ? ' on' : '') + '">' + (run ? '▶ РАБОТАЕТ' : '⏹ СТОП') + '</span></div>';
+    div.onclick = (e) => {
+      if (e.target.tagName !== 'INPUT') { const cb = div.querySelector('input'); cb.checked = !cb.checked; }
+      toggleMassSel(i, div.querySelector('input').checked);
+    };
+    const cb = div.querySelector('input');
+    cb.checked = massSel.has(i);
+    list.appendChild(div);
+  }
+  updateMassUi();
+  document.getElementById('massModal').classList.add('open');
+}
+function toggleMassSel(id, on) {
+  if (on) { massSel.add(id); } else { massSel.delete(id); }
+  updateMassUi();
+  saveMass();
+}
+function updateMassUi() {
+  const n = massSel.size;
+  const ids = [...massSel].sort((a, b) => a - b);
+  let run = 0, stop = 0;
+  ids.forEach(i => lastState['p' + i + '_run'] ? run++ : stop++);
+  document.getElementById('massOkBtn').disabled = n === 0;
+  document.getElementById('massSummary').textContent = n === 0 ? 'Ничего не выбрано'
+    : 'Выбрано ' + n + ': из них работают ' + run + ', стоп ' + stop;
+}
+function confirmMass() {
+  if (!massSel.size) { return; }
+  sendToAhk('TOGGLE_PROFILES|' + [...massSel].sort((a, b) => a - b).join(','));
+  closeModal('massModal');
+}
+
+function startRecording(el, key) {
+  if (recordingEl) { recordingEl.classList.remove('recording'); }
+  recordingEl = el; recordingEl._hkKey = key; recordingEl.classList.add('recording');
+}
+document.addEventListener('keydown', e => {
+  if (!recordingEl) { return; } e.preventDefault();
+  const isMass = recordingEl._hkKey === 'massToggle';
+  if (e.key === 'Backspace') { recordingEl.textContent = '—'; recordingEl.classList.remove('recording'); recordingEl = null; if (isMass) { saveMass(); } return; }
+  if (['Alt','Control','Shift','Meta'].includes(e.key)) { return; }
+  const mods = []; if (e.altKey) mods.push('Alt'); if (e.ctrlKey) mods.push('Ctrl'); if (e.shiftKey) mods.push('Shift');
+  const k = e.key === ' ' ? 'Space' : (e.key.length === 1 ? e.key.toUpperCase() : e.key);
+  recordingEl.textContent = [...mods, k].join('+'); recordingEl.classList.remove('recording'); recordingEl = null;
+  if (isMass) { saveMass(); }
+});
+
+function showToast(msg, type='success') {
+  const c = document.getElementById('toastContainer'); const t = document.createElement('div');
+  t.className = 'toast ' + type; t.textContent = msg; c.appendChild(t); setTimeout(() => t.remove(), 2500);
+}
+
+(function(){
+  function applyZoom() {
+    var w = window.innerWidth || document.documentElement.clientWidth; var BASE_W = 510;
+    if (w > 50 && Math.abs(w - BASE_W) > 10) { document.documentElement.style.zoom = (w / BASE_W).toFixed(4); } else { document.documentElement.style.zoom = '1'; }
+  }
+  applyZoom(); window.addEventListener('resize', applyZoom);
+})();
+
+var tagTimerSec = 0; var tagTimerInterval = null;
+function startTagTimer() {
+  tagTimerSec = 450; updateTagTimer();
+  if (tagTimerInterval) clearInterval(tagTimerInterval);
+  tagTimerInterval = setInterval(function() {
+    tagTimerSec--; if (tagTimerSec < 0) { tagTimerSec = 0; clearInterval(tagTimerInterval); tagTimerInterval = null; } updateTagTimer();
+  }, 1000);
+}
+function updateTagTimer() {
+  var el = document.getElementById('tagTimerDisp'); if (!el) return;
+  if (tagTimerSec <= 0) { el.textContent = '—'; el.style.color = 'var(--text3)'; el.style.animation = 'none'; return; }
+  var m = Math.floor(tagTimerSec / 60); var s = tagTimerSec % 60;
+  el.textContent = m + ':' + String(s).padStart(2, '0');
+  if (tagTimerSec <= 60) { el.style.color = 'var(--red)'; el.style.animation = 'tpulse .7s ease-in-out infinite'; }
+  else if (tagTimerSec <= 300) { el.style.color = 'var(--yellow)'; el.style.animation = 'none'; }
+  else { el.style.color = 'var(--green)'; el.style.animation = 'none'; }
+}
+
+function openTagInfo(){switchTagTab(0);document.getElementById('tagInfoOverlay').classList.add('open');}
+function drawLoupe(gridData) {
+  var canvas = document.getElementById('loupeCanvas'); if (!canvas) return; var ctx = canvas.getContext('2d');
+  var rows = gridData.split(';').filter(function(r){ return r.length > 0; }); var size = rows.length; var cellSize = Math.floor(canvas.width / size);
+  ctx.clearRect(0, 0, canvas.width, canvas.height); var centerRow = Math.floor(size / 2); var centerCol = Math.floor(size / 2); var centerHex = '';
+  for (var r = 0; r < rows.length; r++) {
+    var cols = rows[r].split(',').filter(function(c){ return c.length > 0; });
+    for (var c = 0; c < cols.length; c++) {
+      var hex = cols[c] || '000000'; ctx.fillStyle = '#' + hex; ctx.fillRect(c * cellSize, r * cellSize, cellSize, cellSize);
+      if (r === centerRow && c === centerCol) { centerHex = hex; }
+    }
+  }
+  var cx = centerCol * cellSize + cellSize / 2; var cy = centerRow * cellSize + cellSize / 2;
+  ctx.strokeStyle = 'rgba(255,255,255,0.9)'; ctx.lineWidth = 1.5; ctx.beginPath();
+  ctx.moveTo(cx - 8, cy); ctx.lineTo(cx + 8, cy); ctx.moveTo(cx, cy - 8); ctx.lineTo(cx, cy + 8); ctx.stroke();
+  ctx.strokeStyle = 'rgba(0,212,255,0.8)'; ctx.lineWidth = 2; ctx.strokeRect(centerCol * cellSize + 1, centerRow * cellSize + 1, cellSize - 2, cellSize - 2);
+  var swatch = document.getElementById('loupeSwatch'); var hexEl  = document.getElementById('loupeHex');
+  if (swatch) swatch.style.background = '#' + centerHex; if (hexEl) hexEl.textContent = '#' + centerHex.toUpperCase();
+}
+function closeTagInfo(){document.getElementById('tagInfoOverlay').classList.remove('open');}
+function switchTagTab(i){
+  document.querySelectorAll('.titab').forEach(function(t,idx){t.classList.toggle('active',idx===i);});
+  document.querySelectorAll('.tipage').forEach(function(p,idx){p.classList.toggle('active',idx===i);});
+}
+
+(function(){
+  var canvas=document.getElementById('particleCanvas'),ctx=canvas.getContext('2d'),particles=[];
+  function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;} resize();window.addEventListener('resize',function(){resize();init();});
+  function init(){particles=[];var n=Math.floor(canvas.width*canvas.height/14000);for(var i=0;i<n;i++)particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.35,vy:(Math.random()-.5)*.35,r:Math.random()*1.4+.4,c:Math.random()>.5?'#00d4ff':'#9966ff',a:Math.random()*.45+.15});} init();
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height); var W=canvas.width,H=canvas.height;
+    for(var i=0;i<particles.length;i++){var p=particles[i];p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=p.c;ctx.globalAlpha=p.a;ctx.fill();}
+    for(var i=0;i<particles.length;i++)for(var j=i+1;j<particles.length;j++){var dx=particles[i].x-particles[j].x,dy=particles[i].y-particles[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<85){ctx.beginPath();ctx.moveTo(particles[i].x,particles[i].y);ctx.lineTo(particles[j].x,particles[j].y);ctx.strokeStyle='#00d4ff';ctx.globalAlpha=(1-d/85)*.1;ctx.lineWidth=.5;ctx.stroke();}}
+    ctx.globalAlpha=1;requestAnimationFrame(draw);
+  }
+  draw();
+})();
+</script>
+
+<div class="tag-info-overlay" id="tagInfoOverlay">
+  <div class="tag-info-box">
+    <div class="tag-info-header">
+      <div style="display:flex;align-items:center;gap:8px;"><span>📖</span><span class="tag-info-title">ГАЙД ПО ПРИВАТУ</span></div>
+      <div class="tag-info-close" onclick="closeTagInfo()">✕</div>
+    </div>
+    <div class="tag-info-tabs">
+      <div class="titab active" onclick="switchTagTab(0)">Воин/Лучник</div>
+      <div class="titab" onclick="switchTagTab(1)">Маг/Лучник</div>
+      <div class="titab" onclick="switchTagTab(2)">Лучник/Маг</div>
+    </div>
+    <div class="tag-info-body">
+      <div class="tipage active" id="tipage0">
+        <div class="ti-seq"><span class="ti-step cls">Воин (5)</span><span class="ti-arrow">→</span><span class="ti-step ult">Ульта (Q)</span><span class="ti-arrow">→</span><span class="ti-step mob">Моб 1–4</span><span class="ti-arrow">→</span><span class="ti-step cls">Лучник (1)</span><span class="ti-arrow">→</span><span class="ti-step ult">Ульта (Q)</span></div>
+        <div class="ti-tip ok"><b>Класс 1:</b> 5 (воин) · Ульта 1: Q · Задержка: 100 мс</div>
+        <div class="ti-tip ok"><b>Класс 2:</b> 1 (лучник) · Ульта 2: Q · Задержка: 1000 мс</div>
+        <div class="ti-tip warn"><b>Маг:</b> выключить — в этой связке не используется</div>
+        <div class="ti-tip"><b>Пауза мобов:</b> 300 мс</div>
+      </div>
+      <div class="tipage" id="tipage1">
+        <div class="ti-seq"><span class="ti-step cls">Маг (2)</span><span class="ti-arrow">→</span><span class="ti-step ult">Ульта (Q)</span><span class="ti-arrow">→</span><span class="ti-step aim">Цель (B)</span><span class="ti-arrow">→</span><span class="ti-step mob">Моб 1–4</span><span class="ti-arrow">→</span><span class="ti-step cls">Лучник (1)</span><span class="ti-arrow">→</span><span class="ti-step ult">Ульта (Q)</span></div>
+        <div class="ti-tip ok"><b>Класс 1:</b> 2 (маг) · Ульта 1: Q · Задержка: 100 мс</div>
+        <div class="ti-tip ok"><b>Класс 2:</b> 1 (лучник) · Ульта 2: Q · Задержка: 1000 мс</div>
+        <div class="ti-tip warn"><b>Режим маг: Кл.1</b> — цель (B) нажмётся ДО тегирования мобов</div>
+        <div class="ti-tip"><b>Пауза цели:</b> 100 мс · <b>Пауза мобов:</b> 300 мс</div>
+      </div>
+      <div class="tipage" id="tipage2">
+        <div class="ti-seq"><span class="ti-step cls">Лучник (1)</span><span class="ti-arrow">→</span><span class="ti-step ult">Ульта (Q)</span><span class="ti-arrow">→</span><span class="ti-step mob">Моб 1–4</span><span class="ti-arrow">→</span><span class="ti-step aim">Цель (B)</span><span class="ti-arrow">→</span><span class="ti-step cls">Маг (2)</span><span class="ti-arrow">→</span><span class="ti-step ult">Ульта (Q)</span></div>
+        <div class="ti-tip ok"><b>Класс 1:</b> 1 (лучник) · Ульта 1: Q · Задержка: 100 мс</div>
+        <div class="ti-tip ok"><b>Класс 2:</b> 2 (маг) · Ульта 2: Q · Задержка: 1000 мс</div>
+        <div class="ti-tip warn"><b>Режим маг: Кл.2</b> — цель (B) нажмётся ПОСЛЕ мобов, перед ультой мага</div>
+        <div class="ti-tip"><b>Пауза цели:</b> 100 мс · <b>Пауза мобов:</b> 300 мс</div>
+      </div>
+    </div>
+    <div class="tag-info-footer"><button class="tag-info-btn-close" onclick="closeTagInfo()">✕ ЗАКРЫТЬ</button></div>
+  </div>
+</div>
+</body>
+</html>
